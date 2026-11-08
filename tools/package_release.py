@@ -86,7 +86,6 @@ def main():
         run(TOOLS / "apksigner", "sign", "--ks", store,
             "--ks-key-alias", properties["keyAlias"],
             "--ks-pass", "file:" + str(ROOT / ".signing/password"),
-            "--key-pass", "file:" + str(ROOT / ".signing/password"),
             "--debuggable-apk-permitted", "false", "--out", apk, aligned)
     report = dist / f"{NAME}-{version}-signature.txt"
     report.write_text(verify(apk), encoding="utf-8")
