@@ -10,7 +10,7 @@ DigiPoliceDiscoveryはサービスの通知文言、Service継承、onStartComma
 
 ## フック
 
-Application.attachで検証済み設定を一度取得し、対象アプリ内へフックを設置します。初回の解析が未完了ならそのプロセスへの適用を見送り、解析完了後の対象再起動を案内します。設置に失敗した場合は部分的なフックも解除します。
+Application.attach後、既存のApplication実体、InstrumentationのonCreate経路を一度だけ初期化するガードでまとめ、検証済み設定を一度取得し、対象アプリ内へフックを設置します。初回の解析が未完了ならそのプロセスへの適用を見送り、解析完了後の対象再起動を案内します。設置に失敗した場合は部分的なフックも解除します。
 
 設定が確認済みのfalseならエリアサービスのonStartCommandを実行せず、stopSelfとSTART_NOT_STICKYで終了します。true・キーなし・型違い・未検証版は純正へ進みます。設定変更はSharedPreferencesの通知だけで検出し、OFFになったとき該当サービスだけを止めます。ONへの変更でモジュールが勝手に測位を開始することはありません。
 
@@ -27,3 +27,7 @@ Application.attachで検証済み設定を一度取得し、対象アプリ内�
 `./gradlew :app:testDebugUnitTest :app:assembleRelease :app:lintRelease :app:spotlessCheck`
 
 19件のJVMテストは、OFF/ON/不明設定の判定、サービス所有権、再開始、遅れた登録、二重停止、解除失敗の分離、APK世代ごとに一度だけの解析、同時取得、失敗・中断・破損時の再探索防止を検証します。実機の結果は`testing.md`に別途記録します。OS全体のmAh改善率はこれだけでは証明しません。
+
+## 設定の可視性
+
+対象にはモジュールの設定URIだけをREAD権限として渡し、Androidのパッケージ可視性も確保します。Providerは別途、導入済み対象UIDを照合します。設定アクセスはモジュール起動・更新・bootの単発受信で更新します。アクセスが失われた対象からは、共有された送信UIDを確認する明示的な要求と1回の応答で復旧し、繰り返しタイマーは使いません。任意のパッケージや任意のURIを外部から指定する機能はありません。

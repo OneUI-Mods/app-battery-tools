@@ -8,6 +8,7 @@ import android.content.Intent
 class PackageChangedReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.data?.schemeSpecificPart != Targets.DIGIPOLICE) return
+        ConfigurationAccess.grant(context)
         // Provider initialization enqueues discovery and immediately returns.
         context.contentResolver.call(ModuleProvider.URI, "status", null, null)
     }

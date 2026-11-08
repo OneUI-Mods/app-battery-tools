@@ -1,8 +1,11 @@
 package dev.ryuya.appbatterytools
 
 import android.app.Application
+import android.app.BroadcastOptions
 import android.app.Instrumentation
 import android.app.Service
+import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -18,6 +21,8 @@ import io.github.libxposed.api.XposedModuleInterface.PackageReadyParam
 class HookEntry : XposedModule() {
     private var areaSettingsListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
     private var lifecyclePrepared = false
+    private var initialized = false
+    private var accessRequested = false
 
     override fun onPackageReady(param: PackageReadyParam) {
         Log.i(
@@ -38,6 +43,12 @@ class HookEntry : XposedModule() {
             initialize(application)
             return
         }
+        hook(Application::class.java.getDeclaredMethod("attach", Context::class.java)).intercept {
+            chain ->
+            val result = chain.proceed()
+            initialize(chain.args[0] as Context)
+            result
+        }
         // API 102 PackageReady can arrive after Application.attach. Instrumentation still owns
         // the subsequent onCreate call, including for applications overriding onCreate.
         hook(
@@ -53,10 +64,41 @@ class HookEntry : XposedModule() {
     }
 
     private fun initialize(context: Context) {
+        if (initialized || context.packageName != Targets.DIGIPOLICE) return
         try {
             install(context)
+            initialized = true
         } catch (error: Exception) {
-            report(context, "error", error)
+            if (!accessRequested) {
+                accessRequested = true
+                val request =
+                    Intent(ConfigurationAccess.REQUEST)
+                        .setComponent(
+                            ComponentName(
+                                BuildConfig.APPLICATION_ID,
+                                ConfigurationAccessReceiver::class.java.name,
+                            ),
+                        )
+                context.sendOrderedBroadcast(
+                    request,
+                    null,
+                    BroadcastOptions.makeBasic().setShareIdentityEnabled(true).toBundle(),
+                    object : BroadcastReceiver() {
+                        override fun onReceive(ignored: Context?, intent: Intent?) {
+                            try {
+                                install(context)
+                                initialized = true
+                            } catch (failure: Exception) {
+                                report(context, "error", failure)
+                            }
+                        }
+                    },
+                    Handler(Looper.getMainLooper()),
+                    0,
+                    null,
+                    null,
+                )
+            } else report(context, "error", error)
         } catch (error: LinkageError) {
             report(context, "error", error)
         }
@@ -199,6 +241,7 @@ class HookEntry : XposedModule() {
                         }
                     }
                 preferences.registerOnSharedPreferenceChangeListener(areaSettingsListener)
+                if (suppressAreaService()) main.post(stopDisabledService)
             }
             report(context, "active")
         } catch (error: Throwable) {
@@ -228,8 +271,11 @@ class HookEntry : XposedModule() {
                     released?.let { putInt("released", it) }
                 },
             )
-        } catch (_: Exception) {
-            /* Diagnostics never interrupt a host callback. */
+        } catch (unavailable: Exception) {
+            Log.w(
+                "AppBatteryTools",
+                "Diagnostic provider unavailable: ${unavailable.javaClass.simpleName}",
+            )
         }
     }
 }
