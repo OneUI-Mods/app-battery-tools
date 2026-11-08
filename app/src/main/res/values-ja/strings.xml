@@ -3,10 +3,10 @@
   <string name="app_name">App Battery Tools</string>
   <string name="description">過剰な電池消費を対象ごとに修正します。Vector / Xposed API 102が必要です。</string>
   <string name="enable_module">省電力フックを使う</string>
-  <string name="setup">Vectorでこのモジュールを有効にし、対象にDigi Policeを選択してください。「状態」で解析完了を確認してからDigi Policeを再起動します。</string>
+  <string name="setup">Vectorでこのモジュールを有効にし、使用する対象アプリを選択してください。「状態」で準備完了を確認してから対象アプリを再起動します。OSの再起動は不要です。</string>
   <string name="digi_fix">エリア通知OFF中の不要な測位を止める</string>
   <string name="digi_detail">エリア通知OFF中の測位サービスの開始を防ぎ、終了時の受信処理も解除します。通知ON中の測位、地図、着信ブロックの動作は維持します。</string>
-  <string name="restart_hint">スイッチの変更はDigi Policeの再起動後に適用されます。OFFにすると次回起動から純正動作に戻ります。</string>
+  <string name="restart_hint">設定変更は対象アプリの再起動後に適用されます。OFFにすると次回起動から元の動作に戻ります。</string>
   <string name="discovery_title">解析とフックの状態</string>
   <string name="refresh">更新</string>
   <string name="discovery_detail">DexKitの結果はこのアプリの内部データに保存します。探索は対象アプリの更新・解析ルール変更後の初回だけで、定期監視サービスは動かしません。</string>
@@ -16,16 +16,16 @@
   <string name="back">戻る</string>
   <string name="version">バージョン %1$s</string>
   <string name="support">Android 16 / 17 · libxposed API 102
-Digi Police 3.7.0で経路を確認しています。更新版は契約を照合できた場合だけ適用します。</string>
+対象ごとに経路を照合できた場合だけ適用します。</string>
   <string name="state_ready">解析完了</string>
   <string name="state_preparing">解析を準備中・少し待って更新してください</string>
   <string name="state_active">フック読み込み済み</string>
   <string name="state_removed">位置情報の解除を要求済み</string>
   <string name="state_disabled">OFF</string>
-  <string name="state_restart">解析完了後にDigi Policeを再起動してください</string>
+  <string name="state_restart">準備完了後に対象アプリを再起動してください</string>
   <string name="state_absent">対象アプリが未導入、または署名が未対応</string>
   <string name="state_unsupported">適用見送り・解析またはフックの照合に失敗</string>
-  <string name="state_waiting">Digi Policeの起動待ち</string>
+  <string name="state_waiting">対象アプリの起動待ち</string>
   <string name="status_format">解析: %1$s
 フック: %2$s
 前回の解除要求: %3$d件
@@ -36,4 +36,20 @@ Digi Police 3.7.0で経路を確認しています。更新版は契約を照合
   <string name="state_suppressed">エリア通知OFFのため測位を停止</string>
   <string name="flag_ready">エリア通知のOFF判定: 対応済み</string>
   <string name="flag_unreviewed">設定方式が未検証の版です。開始抑止は適用待ちで、サービス終了時の解除のみ対応します。</string>
+  <string name="windows_database">同じビーコン用データベースを共有する</string>
+  <string name="windows_connections">接続の受け渡し失敗後に到着した通信を解放する</string>
+  <string name="windows_detail">同一プロセス内のDB重複作成を抑え、受け渡し先がなくなった新しい通信だけを閉じます。有効な接続・通知同期・ファイル転送のタイミングは変えません。</string>
+  <string name="ble_wifi">Wi-Fi未接続中はBluetoothの探索を停止する</string>
+  <string name="ble_wifi_detail">Wi-Fiに接続していない間、このアプリのBLE探索を一時停止します。再接続すると再開し、途中でアプリが停止した探索は復活させません。既存のBluetooth接続は維持します。モバイル回線だけの間は、機器の検出や自動解錠が使えなくなる場合があります。</string>
+  <string name="eq_events">出力先の重複計算を省く</string>
+  <string name="eq_detail">同じ出力先の識別情報や検証処理を再利用します。機器の切り替え、音声処理、出力先監視、制御ファイル更新、生存確認の周期は維持します。</string>
+  <string name="ecovacs_release">Matter終了後のマルチキャストロックを解放する</string>
+  <string name="ecovacs_detail">Matterコントローラーの終了後に専用ロックを解放し、次のMatter利用時に取得し直します。別の探索ロックやクラウド通知は変更しません。</string>
+  <string name="state_wifi_paused">Wi-Fi未接続のためBluetooth探索を一時停止</string>
+  <string name="state_wifi_active">Wi-Fi接続中・アプリの探索要求に従って動作</string>
+  <string name="extra_status_format">準備: %1$s
+フック: %2$s
+%3$s</string>
+  <string name="windows_name">Windowsにリンク</string>
+  <string name="sesame_name">セサミ</string>
 </resources>

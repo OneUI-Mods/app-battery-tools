@@ -31,7 +31,7 @@ class HookEntry : XposedModule() {
             "AppBatteryTools",
             "PackageReady ${param.packageName}; build=${BuildConfig.VERSION_CODE}",
         )
-        if (lifecyclePrepared || param.packageName != Targets.DIGIPOLICE) return
+        if (lifecyclePrepared || Targets.find(param.packageName) == null) return
         lifecyclePrepared = true
         val application =
             try {
@@ -41,7 +41,7 @@ class HookEntry : XposedModule() {
             } catch (_: ReflectiveOperationException) {
                 null
             }
-        if (application?.baseContext != null && application.packageName == Targets.DIGIPOLICE) {
+        if (application?.baseContext != null && Targets.find(application.packageName) != null) {
             initialize(application)
             return
         }
@@ -66,7 +66,7 @@ class HookEntry : XposedModule() {
     }
 
     private fun initialize(context: Context) {
-        if (initialized || context.packageName != Targets.DIGIPOLICE) return
+        if (initialized || Targets.find(context.packageName) == null) return
         try {
             install(context)
             initialized = true
@@ -107,12 +107,25 @@ class HookEntry : XposedModule() {
     }
 
     private fun install(context: Context) {
-        val config = context.contentResolver.call(ModuleProvider.URI, "settings", null, null)
+        val config =
+            context.contentResolver.call(ModuleProvider.URI, "settings", context.packageName, null)
         if (config == null || !config.getBoolean("ready")) {
             report(context, "not_ready")
             return
         }
-        if (!config.getBoolean("enabled") || !config.getBoolean("digipolice")) {
+        if (!config.getBoolean("enabled")) {
+            report(context, "disabled")
+            return
+        }
+        if (context.packageName != Targets.DIGIPOLICE) {
+            check(config.getString("apk") == context.applicationInfo.sourceDir)
+            ExtraHooks(this, context) { state, error, count ->
+                    report(context, state, error, count)
+                }
+                .install(config)
+            return
+        }
+        if (!config.getBoolean("digipolice")) {
             report(context, "disabled")
             return
         }
@@ -128,12 +141,12 @@ class HookEntry : XposedModule() {
             Class.forName("com.google.android.gms.location.LocationRequest", false, loader)
         val register =
             client.getDeclaredMethod(
-                config.getString("register"),
+                checkNotNull(config.getString("register")),
                 request,
                 callback,
                 Looper::class.java,
             )
-        val remove = client.getDeclaredMethod(config.getString("remove"), callback)
+        val remove = client.getDeclaredMethod(checkNotNull(config.getString("remove")), callback)
         check(
             register.returnType == remove.returnType &&
                 register.returnType.name == config.getString("task"),
@@ -300,7 +313,7 @@ class HookEntry : XposedModule() {
             context.contentResolver.call(
                 ModuleProvider.URI,
                 "report",
-                null,
+                context.packageName,
                 Bundle().apply {
                     putString("state", state)
                     if (error != null) putString("error", error.javaClass.simpleName)

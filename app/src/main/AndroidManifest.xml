@@ -1,6 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <queries><package android:name="jp.co.dawncorp.DigiPolice" /></queries>
+    <queries><package android:name="jp.co.dawncorp.DigiPolice" />
+        <package android:name="com.microsoft.appmanager" />
+        <package android:name="com.govee.home" />
+        <package android:name="co.candyhouse.sesame2" />
+        <package android:name="rakkashin.earpieceeq" />
+        <package android:name="com.eco.global.app" />
+    </queries>
     <application android:name=".ModuleApplication" android:label="@string/app_name"
         android:description="@string/description" android:icon="@drawable/ic_launcher"
         android:theme="@style/AppTheme" android:allowBackup="false" android:supportsRtl="true">

@@ -14,7 +14,7 @@ import com.google.android.material.textview.MaterialTextView
 /** No polling service: diagnostics refresh only while opening this screen or on demand. */
 class MainActivity : AppCompatActivity() {
     private lateinit var tabs: SettingsTabs
-    private lateinit var status: MaterialTextView
+    private val statuses = linkedMapOf<String, MaterialTextView>()
     private val settings by lazy { getSharedPreferences("settings", 0) }
     private val statusEvents =
         object : ContentObserver(Handler(Looper.getMainLooper())) {
@@ -31,19 +31,23 @@ class MainActivity : AppCompatActivity() {
         val master = Ui.card(apps)
         switch(master, "enabled", R.string.enable_module)
         master.addView(Ui.text(this, getString(R.string.setup)))
-        val digi = Ui.card(apps)
-        digi.addView(Ui.text(this, "Digi Police", true))
-        switch(digi, "digipolice", R.string.digi_fix)
-        digi.addView(Ui.text(this, getString(R.string.digi_detail)))
-        digi.addView(Ui.text(this, getString(R.string.restart_hint)))
+        for (target in Targets.all) {
+            val card = Ui.card(apps)
+            card.addView(Ui.text(this, targetTitle(target), true))
+            target.options.forEach { switch(card, it.key, it.label) }
+            card.addView(Ui.text(this, getString(target.detail)))
+        }
+        apps.addView(Ui.text(this, getString(R.string.restart_hint)))
 
         val diagnostics = tabs.page(R.string.tab_status)
-        val panel = Ui.card(diagnostics)
-        panel.addView(Ui.text(this, getString(R.string.discovery_title), true))
-        status = Ui.text(this, "")
-        status.setTextIsSelectable(true)
-        panel.addView(status)
-        panel.addView(
+        for (target in Targets.all) {
+            val panel = Ui.card(diagnostics)
+            panel.addView(Ui.text(this, targetTitle(target), true))
+            val view = Ui.text(this, "").apply { setTextIsSelectable(true) }
+            statuses[target.packageName] = view
+            panel.addView(view)
+        }
+        diagnostics.addView(
             MaterialButton(this).apply {
                 setText(R.string.refresh)
                 setOnClickListener { refresh() }
@@ -68,6 +72,13 @@ class MainActivity : AppCompatActivity() {
         refresh()
     }
 
+    private fun targetTitle(target: Targets.Target): String =
+        when (target.packageName) {
+            Targets.WINDOWS -> getString(R.string.windows_name)
+            Targets.SESAME -> getString(R.string.sesame_name)
+            else -> target.name
+        }
+
     private fun switch(parent: LinearLayout, key: String, label: Int) {
         parent.addView(
             MaterialSwitch(this).apply {
@@ -83,7 +94,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (::status.isInitialized) refresh()
+        if (statuses.isNotEmpty()) refresh()
     }
 
     override fun onStart() {
@@ -97,44 +108,59 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun refresh() {
-        val result = contentResolver.call(ModuleProvider.URI, "status", null, null)
-        fun state(value: String?) =
-            getString(
-                when (value) {
-                    "ready" -> R.string.state_ready
-                    "preparing",
-                    "waiting",
-                    "interrupted" -> R.string.state_preparing
-                    "active" -> R.string.state_active
-                    "removal_requested" -> R.string.state_removed
-                    "suppressed" -> R.string.state_suppressed
-                    "disabled" -> R.string.state_disabled
-                    "not_ready" -> R.string.state_restart
-                    "not_installed_or_untrusted" -> R.string.state_absent
-                    "error",
-                    "failed",
-                    "native-unavailable",
-                    "corrupt",
-                    "unsupported" -> R.string.state_unsupported
-                    else -> R.string.state_waiting
-                },
-            )
-        status.text =
-            getString(
-                R.string.status_format,
-                state(result?.getString("discovery")),
-                state(result?.getString("hostState")),
-                result?.getInt("released") ?: 0,
-                result?.getString("error").orEmpty(),
-            )
-        if (result?.getBoolean("ready") == true) {
-            status.append(
-                "\n" +
+        for (target in Targets.all) {
+            val result =
+                contentResolver.call(ModuleProvider.URI, "status", target.packageName, null)
+            val status = statuses.getValue(target.packageName)
+            fun state(value: String?) =
+                getString(
+                    when (value) {
+                        "ready" -> R.string.state_ready
+                        "preparing",
+                        "waiting",
+                        "interrupted" -> R.string.state_preparing
+                        "active" -> R.string.state_active
+                        "wifi_paused" -> R.string.state_wifi_paused
+                        "wifi_active" -> R.string.state_wifi_active
+                        "removal_requested" -> R.string.state_removed
+                        "suppressed" -> R.string.state_suppressed
+                        "disabled" -> R.string.state_disabled
+                        "not_ready" -> R.string.state_restart
+                        "not_installed_or_untrusted" -> R.string.state_absent
+                        "error",
+                        "failed",
+                        "native-unavailable",
+                        "corrupt",
+                        "unsupported" -> R.string.state_unsupported
+                        else -> R.string.state_waiting
+                    },
+                )
+            if (target.packageName == Targets.DIGIPOLICE)
+                status.text =
                     getString(
-                        if (result.getString("area_guard") == "reviewed") R.string.flag_ready
-                        else R.string.flag_unreviewed,
-                    ),
-            )
+                        R.string.status_format,
+                        state(result?.getString("discovery")),
+                        state(result?.getString("hostState")),
+                        result?.getInt("released") ?: 0,
+                        result?.getString("error").orEmpty(),
+                    )
+            else
+                status.text =
+                    getString(
+                        R.string.extra_status_format,
+                        state(result?.getString("discovery")),
+                        state(result?.getString("hostState")),
+                        result?.getString("error").orEmpty(),
+                    )
+            if (target.packageName == Targets.DIGIPOLICE && result?.getBoolean("ready") == true) {
+                status.append(
+                    "\n" +
+                        getString(
+                            if (result.getString("area_guard") == "reviewed") R.string.flag_ready
+                            else R.string.flag_unreviewed,
+                        ),
+                )
+            }
         }
     }
 

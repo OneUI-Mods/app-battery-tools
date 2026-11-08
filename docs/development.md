@@ -2,6 +2,8 @@
 
 Android側はKotlin、compile/target SDK 37、min SDK 36、libxposed API 102です。`app/src/main`に実機試験用Activityや起動代行サービスを追加しません。
 
+Windowsにリンク、BLEのWi-Fi制限、EQ、ECOVACSの追加設計は[追加対象の設計](additional-hooks.md)を参照してください。対象別の状態と内部キャッシュを持ち、設定やキャッシュを他アプリのデータ領域へ受け渡しません。
+
 ## 処理の所有者
 
 ModuleProviderが固定の対象と署名を検証し、DexKitをワーカーで実行します。キャッシュはモジュール自身の`files/dexkit/<package>/`に保存します。対象の版・更新時刻・APK/splitの配置と属性・署名・解析ルールで世代を分け、失敗・中断・破損結果も記録して同じ版の無限再探索を防ぎます。フック先の保存領域や共有ストレージへキャッシュを渡しません。
@@ -26,7 +28,7 @@ Application.attach後、既存のApplication実体、InstrumentationのonCreate�
 
 `./gradlew :app:testDebugUnitTest :app:assembleRelease :app:lintRelease :app:spotlessCheck`
 
-19件のJVMテストは、OFF/ON/不明設定の判定、サービス所有権、再開始、遅れた登録、二重停止、解除失敗の分離、APK世代ごとに一度だけの解析、同時取得、失敗・中断・破損時の再探索防止を検証します。実機の結果は`testing.md`に別途記録します。OS全体のmAh改善率はこれだけでは証明しません。
+従来のDigi Police・キャッシュ向け19件のJVMテストは、OFF/ON/不明設定の判定、サービス所有権、再開始、遅れた登録、二重停止、解除失敗の分離、APK世代ごとに一度だけの解析、同時取得、失敗・中断・破損時の再探索防止を検証します。実機の結果は`testing.md`に別途記録します。OS全体のmAh改善率はこれだけでは証明しません。
 
 ## 設定の可視性
 
@@ -35,3 +37,5 @@ Application.attach後、既存のApplication実体、InstrumentationのonCreate�
 ## FGS起動の回帰
 
 実機の連続外部起動で、startForegroundを省いて即stopSelfにするとForegroundServiceDidNotStartInTimeExceptionが発生した。試行中の版は公開せず、外部起動では純正のforeground準備を完了してから停止する方式へ修正した。設定OFFイベントで止める対象も、純正onStartCommandが完了した実体に限る。位置登録の追跡・解除はその実体にだけ対応付ける。修正後の複数回起動と12秒の待機で、同一PIDの維持とGPS停止を確認した。
+
+追加機能を含めたJVMテストは49件です。Android 16/17のAPK照合・模擬通信・UI確認は[0.2.0の検証](testing-0.2.0.md)へ記録します。

@@ -9,10 +9,10 @@ internal object ConfigurationAccess {
     const val REQUEST = "dev.ryuya.appbatterytools.REQUEST_CONFIGURATION_ACCESS"
 
     fun grant(context: Context) {
-        try {
-            context.packageManager.getApplicationInfo(Targets.DIGIPOLICE, 0)
+        for (target in Targets.all) try {
+            context.packageManager.getApplicationInfo(target.packageName, 0)
             context.grantUriPermission(
-                Targets.DIGIPOLICE,
+                target.packageName,
                 ModuleProvider.URI,
                 Intent.FLAG_GRANT_READ_URI_PERMISSION,
             )

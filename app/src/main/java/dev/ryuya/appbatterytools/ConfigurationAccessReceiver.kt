@@ -14,13 +14,16 @@ class ConfigurationAccessReceiver : BroadcastReceiver() {
         ) {
             ConfigurationAccess.grant(context)
         } else if (intent.action == ConfigurationAccess.REQUEST) {
-            val targetUid =
-                try {
-                    context.packageManager.getApplicationInfo(Targets.DIGIPOLICE, 0).uid
-                } catch (_: PackageManager.NameNotFoundException) {
-                    return
+            val knownUid =
+                Targets.all.any { target ->
+                    try {
+                        context.packageManager.getApplicationInfo(target.packageName, 0).uid ==
+                            sentFromUid
+                    } catch (_: PackageManager.NameNotFoundException) {
+                        false
+                    }
                 }
-            if (sentFromUid == targetUid) ConfigurationAccess.grant(context)
+            if (knownUid) ConfigurationAccess.grant(context)
         }
     }
 }

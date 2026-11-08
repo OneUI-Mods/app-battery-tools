@@ -3,10 +3,10 @@
   <string name="app_name">App Battery Tools</string>
   <string name="description">Targeted battery fixes. Requires Vector / Xposed API 102.</string>
   <string name="enable_module">Enable battery fixes</string>
-  <string name="setup">Enable this module in Vector and select Digi Police as its scope. Wait for analysis in Status, then restart Digi Police.</string>
+  <string name="setup">Enable this module in Vector and select the apps you use. Wait for preparation in Status, then restart those apps. No OS restart is required.</string>
   <string name="digi_fix">Stop unnecessary location while area notifications are off</string>
   <string name="digi_detail">Prevents the area location service from starting while its setting is OFF, and releases its callbacks on termination. Enabled area notifications, maps and call screening retain original behavior.</string>
-  <string name="restart_hint">Changes apply after restarting Digi Police. Switching off restores original behavior on the next start.</string>
+  <string name="restart_hint">Changes apply after restarting the selected app. Switching off restores its original behavior on the next start.</string>
   <string name="discovery_title">Discovery and hook status</string>
   <string name="refresh">Refresh</string>
   <string name="discovery_detail">DexKit results stay in this app’s private data. Discovery runs once per target update or rule revision. No polling service.</string>
@@ -15,17 +15,16 @@
   <string name="legal_open">View license</string>
   <string name="back">Back</string>
   <string name="version">Version %1$s</string>
-  <string name="support">Android 16 / 17 · libxposed API 102
-Digi Police 3.7.0 is reviewed. Updates are used only when their contracts match.</string>
+  <string name="support">Android 16 / 17 · libxposed API 102. Each target is applied only after its contracts are verified.</string>
   <string name="state_ready">Analysis complete</string>
   <string name="state_preparing">Preparing analysis; refresh shortly</string>
   <string name="state_active">Hook loaded</string>
   <string name="state_removed">Location cleanup requested</string>
   <string name="state_disabled">Disabled</string>
-  <string name="state_restart">Restart Digi Police after analysis</string>
+  <string name="state_restart">Restart this app after preparation</string>
   <string name="state_absent">Target missing or signer unsupported</string>
   <string name="state_unsupported">Not applied: analysis or hook check failed</string>
-  <string name="state_waiting">Waiting for Digi Police</string>
+  <string name="state_waiting">Waiting for the target app</string>
   <string name="status_format">Analysis: %1$s
 Hook: %2$s
 Last cleanup: %3$d callbacks
@@ -36,4 +35,20 @@ Last cleanup: %3$d callbacks
   <string name="state_suppressed">Stopped: area notifications are off</string>
   <string name="flag_ready">Area OFF setting: reviewed and supported</string>
   <string name="flag_unreviewed">Area setting model changed: start blocking awaits review; lifecycle cleanup remains available</string>
+  <string name="windows_database">Reuse the same beacon database</string>
+  <string name="windows_connections">Close clients arriving after a failed connection handoff</string>
+  <string name="windows_detail">Shares one database per process and releases only newly opened clients whose handoff already failed. Active connections, notification sync and file transfers retain their original timing.</string>
+  <string name="ble_wifi">Pause Bluetooth scanning when Wi-Fi is disconnected</string>
+  <string name="ble_wifi_detail">Pauses this app’s BLE discovery while disconnected from Wi-Fi. Requested scans resume when Wi-Fi reconnects; scans explicitly stopped in the meantime stay stopped. Existing Bluetooth connections are retained. Discovery and automatic unlock may be unavailable while using only mobile data.</string>
+  <string name="eq_events">Reuse repeated output-route calculations</string>
+  <string name="eq_detail">Reuses the same output identifier and validation calculations. Device changes, audio processing, output monitoring, control-file updates and heartbeat timing remain unchanged.</string>
+  <string name="ecovacs_release">Release the Matter multicast lock after controller shutdown</string>
+  <string name="ecovacs_detail">Releases the owned multicast lock after Matter controller shutdown and reacquires it when Matter starts again. Other discovery locks and cloud notifications are unchanged.</string>
+  <string name="state_wifi_paused">Bluetooth scans paused: no Wi-Fi connection</string>
+  <string name="state_wifi_active">Wi-Fi connected: scan requests follow the app</string>
+  <string name="extra_status_format">Preparation: %1$s
+Hook: %2$s
+%3$s</string>
+  <string name="windows_name">Link to Windows</string>
+  <string name="sesame_name">Sesame</string>
 </resources>

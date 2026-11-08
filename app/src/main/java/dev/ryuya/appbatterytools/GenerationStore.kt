@@ -84,8 +84,11 @@ class GenerationStore(private val directory: File) {
         private const val MAGIC = 0x4f554431
 
         fun digest(value: String): String {
-            val bytes =
-                MessageDigest.getInstance("SHA-256").digest(value.toByteArray(Charsets.UTF_8))
+            return digestBytes(value.toByteArray(Charsets.UTF_8))
+        }
+
+        fun digestBytes(value: ByteArray): String {
+            val bytes = MessageDigest.getInstance("SHA-256").digest(value)
             val hex = "0123456789abcdef"
             val output = CharArray(bytes.size * 2)
             for (i in bytes.indices) {
