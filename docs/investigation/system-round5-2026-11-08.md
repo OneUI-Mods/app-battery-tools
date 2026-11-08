@@ -61,3 +61,17 @@ SEAD自身のCameraDevice.StateCallback.onClosedの正常完了後だけ、閉�
 | `com.sec.android.diagmonagent` | 9.7.06 | `f5ffe2bf4e7a1b9036ab8826a5da2abfd5e10fa7a2347525ec8cd98a1b67f640` |
 | `com.samsung.android.wifi.intelligence` | 17 | `ffdcd2cb2ff9f5acc84aa77d9504bb6dc0b708ff2dc0c77f249dad2bcbbb93c4` |
 | `com.samsung.android.email.provider` | 6.2.15.11 | `4aec49175c6f788780e634547cbde179016111ea88a7bd8414726cfa34f55668` |
+
+## スクリーンショットの初回トレース
+
+ユーザーが通常の方法で1回撮影した45秒のトレースを取得した。撮影・保存に加え、純正の文字認識・画像分類ワーカーが起動していた。
+
+- ImageExporter_writeImageは約1358ms、ImageExporter_execute全体は約1430ms。
+- SystemUIの撮影用プロセス、Samsungキャプチャのメイン、ondemandscreenshotworkerがそれぞれ起動した。CPU実行時間は順に約2.35秒、4.55秒、4.64秒。これらは記録内の集計で、同じ壁時計時間では並行して動く。
+- キャプチャメインの1秒区間で約1.86 CPU秒、後続ワーカーの1秒区間で約1.93 CPU秒。後続の開始後にはOCR、MiniLM、TinyViT関連のクラス読み込みを確認した。読み込みと推論時間を同一視しない。
+- 保存スレッドのCPUは約1369msだったが、画像書き込みだけのCPUと厳密には区切っていない。上記1358msは壁時計時間である。
+- 主な後続負荷は撮影開始から約9〜13秒後にも見られた。保存が終わった後も別プロセスで処理が続く構成である。
+
+rootで読んだlogcatには今回の撮影記録を取得できず、判定はPerfettoのslice・sched・開始プロセスと、撮影後のpsへ基づく。プロセス名の一部はzygote64/NULLのままだったため、固定名だけで集計せずPID・UID・実行スレッド名・APK読み込みを照合した。64MBのRING_BUFFERによりschedの冒頭約11秒は残っていない。撮影開始は約20秒時点であり、撮影区間は残っていた。冒頭欠落を0 CPUとして扱わず、45秒平均の負荷として解釈しない。FrameTimelineのinfoエラーはあり、フレーム品質の評価には使わない。
+
+無改造でも起きるというユーザーの観測と整合する純正の処理を確認したが、今回の端末はモジュール有効の状態であり、全CPUを無改造時にも同量発生すると実証したわけではない。画像解析の重複や、機能を維持したまま減らせる処理は追加確認する。画質・保存内容・文字認識機能を一律に落とす補正はしていない。
