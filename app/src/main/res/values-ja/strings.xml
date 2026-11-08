@@ -4,8 +4,8 @@
   <string name="description">過剰な電池消費を対象ごとに修正します。Vector / Xposed API 102が必要です。</string>
   <string name="enable_module">省電力フックを使う</string>
   <string name="setup">Vectorでこのモジュールを有効にし、対象にDigi Policeを選択してください。「状態」で解析完了を確認してからDigi Policeを再起動します。</string>
-  <string name="digi_fix">エリア通知終了時の測位を解除</string>
-  <string name="digi_detail">エリア通知サービスが終了したとき、そのサービスが登録した位置情報の受信処理だけを解除します。通知ON中の測位、地図、着信ブロックの動作は維持します。</string>
+  <string name="digi_fix">エリア通知OFF中の不要な測位を止める</string>
+  <string name="digi_detail">エリア通知OFF中の測位サービスの開始を防ぎ、終了時の受信処理も解除します。通知ON中の測位、地図、着信ブロックの動作は維持します。</string>
   <string name="restart_hint">スイッチの変更はDigi Policeの再起動後に適用されます。OFFにすると次回起動から純正動作に戻ります。</string>
   <string name="discovery_title">解析とフックの状態</string>
   <string name="refresh">更新</string>
@@ -33,4 +33,7 @@ Digi Police 3.7.0で経路を確認しています。更新版は契約を照合
   <string name="tab_apps">アプリ</string>
   <string name="tab_status">状態</string>
   <string name="tab_about">情報</string>
+  <string name="state_suppressed">エリア通知OFFのため測位を停止</string>
+  <string name="flag_ready">エリア通知のOFF判定: 対応済み</string>
+  <string name="flag_unreviewed">設定方式が未検証の版です。開始抑止は適用待ちで、サービス終了時の解除のみ対応します。</string>
 </resources>

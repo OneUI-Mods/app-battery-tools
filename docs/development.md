@@ -1,0 +1,29 @@
+# 開発
+
+Android側はKotlin、compile/target SDK 37、min SDK 36、libxposed API 102です。`app/src/main`に実機試験用Activityや起動代行サービスを追加しません。
+
+## 処理の所有者
+
+ModuleProviderが固定の対象と署名を検証し、DexKitをワーカーで実行します。キャッシュはモジュール自身の`files/dexkit/<package>/`に保存します。対象の版・更新時刻・APK/splitの配置と属性・署名・解析ルールで世代を分け、失敗・中断・破損結果も記録して同じ版の無限再探索を防ぎます。フック先の保存領域や共有ストレージへキャッシュを渡しません。
+
+DigiPoliceDiscoveryはサービスの通知文言、Service継承、onStartCommandの型、位置登録と同じコールバック型を使う解除メソッドを一意に照合します。短い難読化名に依存して新しい版を推測しません。Dartの設定モデルはDexKitの解析対象ではないため、確認したAOTハッシュの版でだけ`titanium/IS_ARROWED_AREA_NOTIFICATION`を採用します。違う版は開始抑止を見送り、Javaの終了時解除だけに限定します。
+
+## フック
+
+Application.attachで検証済み設定を一度取得し、対象アプリ内へフックを設置します。初回の解析が未完了ならそのプロセスへの適用を見送り、解析完了後の対象再起動を案内します。設置に失敗した場合は部分的なフックも解除します。
+
+設定が確認済みのfalseならエリアサービスのonStartCommandを実行せず、stopSelfとSTART_NOT_STICKYで終了します。true・キーなし・型違い・未検証版は純正へ進みます。設定変更はSharedPreferencesの通知だけで検出し、OFFになったとき該当サービスだけを止めます。ONへの変更でモジュールが勝手に測位を開始することはありません。
+
+位置コールバックの所有者はサービス実体で管理します。onStartCommand中に発生した登録だけを追跡し、onDestroyで対応するクライアント・コールバックの解除を要求します。停止→再開始でも新しい実体の登録は触りません。非同期Taskの完了を確認したという表示は行わず、診断は「解除要求」とします。
+
+## 自身を常駐させない
+
+サービス・Foreground Service権限・アラーム・定期ジョブ・ポーリングを持ちません。初回解析とBinder接続情報取得のワーカーはアイドル1秒でスレッドを終了します。設定画面は可視期間だけContentObserverを登録し、状態変化または利用者の更新操作で描画します。対象アプリ内の設定リスナーもイベント駆動です。
+
+`tools/package_release.py`はサービスとFGS権限の混入を拒否します。Androidがキャッシュプロセスを残すことと、定期処理が動き続けることは区別します。
+
+## 検証
+
+`./gradlew :app:testDebugUnitTest :app:assembleRelease :app:lintRelease :app:spotlessCheck`
+
+19件のJVMテストは、OFF/ON/不明設定の判定、サービス所有権、再開始、遅れた登録、二重停止、解除失敗の分離、APK世代ごとに一度だけの解析、同時取得、失敗・中断・破損時の再探索防止を検証します。実機の結果は`testing.md`に別途記録します。OS全体のmAh改善率はこれだけでは証明しません。

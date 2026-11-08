@@ -4,7 +4,9 @@ import android.app.Application
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
 import android.os.Looper
 import io.github.libxposed.api.XposedInterface.HookHandle
 import io.github.libxposed.api.XposedModule
@@ -14,6 +16,7 @@ import io.github.libxposed.api.XposedModuleInterface.PackageReadyParam
 /** Only the area service owns cleanup. Original request parameters and results pass through. */
 class HookEntry : XposedModule() {
     private var processName = ""
+    private var areaSettingsListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
 
     override fun onModuleLoaded(param: ModuleLoadedParam) {
         processName = param.processName
@@ -88,6 +91,27 @@ class HookEntry : XposedModule() {
         remove.isAccessible = true
         val owner = ThreadLocal<Any?>()
         var healthy = true
+        val preferences =
+            context.getSharedPreferences(Targets.AREA_PREFERENCES, Context.MODE_PRIVATE)
+        val settingsReviewed = config.getString("area_guard") == "reviewed"
+        fun suppressAreaService(): Boolean {
+            val stored =
+                try {
+                    if (preferences.contains(Targets.AREA_KEY))
+                        preferences.getBoolean(Targets.AREA_KEY, true)
+                    else null
+                } catch (_: ClassCastException) {
+                    null
+                }
+            return AreaPolicy.shouldSuppress(settingsReviewed, stored)
+        }
+        val main = Handler(Looper.getMainLooper())
+        val stopDisabledService = Runnable {
+            if (suppressAreaService()) {
+                context.stopService(Intent(context, service))
+                report(context, "suppressed")
+            }
+        }
         val leases =
             LocationLeases<Any, Any, Any>(
                 { c, listener ->
@@ -119,6 +143,11 @@ class HookEntry : XposedModule() {
             installed +=
                 hook(start).intercept { chain ->
                     val instance = checkNotNull(chain.thisObject)
+                    if (suppressAreaService()) {
+                        (instance as Service).stopSelf(chain.args[2] as Int)
+                        report(context, "suppressed")
+                        return@intercept Service.START_NOT_STICKY
+                    }
                     val previous = owner.get()
                     if (healthy) {
                         leases.start(instance)
@@ -142,10 +171,23 @@ class HookEntry : XposedModule() {
                         }
                     }
                 }
+            if (settingsReviewed) {
+                areaSettingsListener =
+                    SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+                        if (key == Targets.AREA_KEY && suppressAreaService()) {
+                            main.removeCallbacks(stopDisabledService)
+                            main.post(stopDisabledService)
+                        }
+                    }
+                preferences.registerOnSharedPreferenceChangeListener(areaSettingsListener)
+            }
             report(context, "active")
         } catch (error: Throwable) {
             // No partial interception survives an installation failure.
             for (handle in installed.asReversed()) runCatching { handle.unhook() }
+            areaSettingsListener?.let(preferences::unregisterOnSharedPreferenceChangeListener)
+            areaSettingsListener = null
+            main.removeCallbacks(stopDisabledService)
             throw error
         }
     }

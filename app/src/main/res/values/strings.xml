@@ -4,8 +4,8 @@
   <string name="description">Targeted battery fixes. Requires Vector / Xposed API 102.</string>
   <string name="enable_module">Enable battery fixes</string>
   <string name="setup">Enable this module in Vector and select Digi Police as its scope. Wait for analysis in Status, then restart Digi Police.</string>
-  <string name="digi_fix">Stop location updates when area notifications stop</string>
-  <string name="digi_detail">Releases only callbacks owned by the area service when it ends. Enabled area notifications, maps and call screening retain their original behavior.</string>
+  <string name="digi_fix">Stop unnecessary location while area notifications are off</string>
+  <string name="digi_detail">Prevents the area location service from starting while its setting is OFF, and releases its callbacks on termination. Enabled area notifications, maps and call screening retain original behavior.</string>
   <string name="restart_hint">Changes apply after restarting Digi Police. Switching off restores original behavior on the next start.</string>
   <string name="discovery_title">Discovery and hook status</string>
   <string name="refresh">Refresh</string>
@@ -33,4 +33,7 @@ Last cleanup: %3$d callbacks
   <string name="tab_apps">Apps</string>
   <string name="tab_status">Status</string>
   <string name="tab_about">About</string>
+  <string name="state_suppressed">Stopped: area notifications are off</string>
+  <string name="flag_ready">Area OFF setting: reviewed and supported</string>
+  <string name="flag_unreviewed">Area setting model changed: start blocking awaits review; lifecycle cleanup remains available</string>
 </resources>

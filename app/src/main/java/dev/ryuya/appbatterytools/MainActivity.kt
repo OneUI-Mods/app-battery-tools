@@ -107,6 +107,7 @@ class MainActivity : AppCompatActivity() {
                     "interrupted" -> R.string.state_preparing
                     "active" -> R.string.state_active
                     "removal_requested" -> R.string.state_removed
+                    "suppressed" -> R.string.state_suppressed
                     "disabled" -> R.string.state_disabled
                     "not_ready" -> R.string.state_restart
                     "not_installed_or_untrusted" -> R.string.state_absent
@@ -126,6 +127,15 @@ class MainActivity : AppCompatActivity() {
                 result?.getInt("released") ?: 0,
                 result?.getString("error").orEmpty(),
             )
+        if (result?.getBoolean("ready") == true) {
+            status.append(
+                "\n" +
+                    getString(
+                        if (result.getString("area_guard") == "reviewed") R.string.flag_ready
+                        else R.string.flag_unreviewed,
+                    ),
+            )
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

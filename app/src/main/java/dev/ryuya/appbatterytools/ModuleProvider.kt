@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 /** The module owns discovery, cache files and diagnostics. Hosts never supply paths or queries. */
 class ModuleProvider : ContentProvider() {
-    private data class Identity(val generation: String, val apk: String)
+    private data class Identity(val generation: String, val apk: String, val files: List<String>)
 
     private val worker = BackgroundExecutors.serial("BatteryDiscovery", idleMillis = 1_000)
     private val pending = AtomicBoolean()
@@ -68,6 +68,7 @@ class ModuleProvider : ContentProvider() {
                     )
                     .joinToString("|"),
                 app.sourceDir,
+                files,
             )
         } catch (_: PackageManager.NameNotFoundException) {
             null
@@ -90,7 +91,8 @@ class ModuleProvider : ContentProvider() {
                 val resolved =
                     store.readOrExplore(target.generation) {
                         searches.incrementAndGet()
-                        DigiPoliceDiscovery.explore(target.apk) + ("apk" to target.apk)
+                        DigiPoliceDiscovery.explore(target.apk, target.files) +
+                            ("apk" to target.apk)
                     }
                 result = target.generation to resolved
             } finally {
@@ -138,6 +140,7 @@ class ModuleProvider : ContentProvider() {
                 state in
                     setOf(
                         "active",
+                        "suppressed",
                         "disabled",
                         "not_ready",
                         "unsupported",
