@@ -9,6 +9,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import io.github.libxposed.api.XposedInterface.HookHandle
 import io.github.libxposed.api.XposedModule
 import io.github.libxposed.api.XposedModuleInterface.PackageReadyParam
@@ -19,12 +20,11 @@ class HookEntry : XposedModule() {
     private var lifecyclePrepared = false
 
     override fun onPackageReady(param: PackageReadyParam) {
-        if (
-            lifecyclePrepared ||
-                param.packageName != Targets.DIGIPOLICE ||
-                Application.getProcessName() != Targets.DIGIPOLICE
+        Log.i(
+            "AppBatteryTools",
+            "PackageReady ${param.packageName}; build=${BuildConfig.VERSION_CODE}",
         )
-            return
+        if (lifecyclePrepared || param.packageName != Targets.DIGIPOLICE) return
         lifecyclePrepared = true
         val application =
             try {

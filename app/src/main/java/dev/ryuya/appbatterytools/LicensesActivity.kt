@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.LinearLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.NestedScrollView
 import com.google.android.material.appbar.MaterialToolbar
@@ -15,6 +16,7 @@ import org.json.JSONObject
 
 /** Searchable library cards open a separate license page instead of one giant text dump. */
 class LicensesActivity : AppCompatActivity() {
+    private var detailed = false
     private val libraries by lazy {
         val list =
             assets.open("legal/libraries.json").bufferedReader().use { JSONArray(it.readText()) }
@@ -23,6 +25,14 @@ class LicensesActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (detailed) catalog() else finish()
+                }
+            },
+        )
         catalog()
     }
 
@@ -37,6 +47,7 @@ class LicensesActivity : AppCompatActivity() {
     }
 
     private fun catalog() {
+        detailed = false
         val root = page(getString(R.string.legal_title))
         val field = TextInputLayout(this).apply { setHint(R.string.legal_search) }
         val search = TextInputEditText(field.context).apply { isSingleLine = true }
@@ -90,6 +101,7 @@ class LicensesActivity : AppCompatActivity() {
     }
 
     private fun detail(library: JSONObject) {
+        detailed = true
         val root = page(library.getString("title"))
         (root.getChildAt(0) as MaterialToolbar).setNavigationOnClickListener { catalog() }
         val body =
@@ -98,8 +110,14 @@ class LicensesActivity : AppCompatActivity() {
                 setPadding(24, 16, 24, 16)
             }
         val license = assets.open(library.getString("asset")).bufferedReader().use { it.readText() }
+        val notice =
+            library.optString("notice").let { value ->
+                if (value.startsWith("legal/"))
+                    assets.open(value).bufferedReader().use { it.readText() }
+                else value
+            }
         body.addView(
-            Ui.text(this, library.optString("notice") + "\n\n" + license).apply {
+            Ui.text(this, notice + "\n\n" + license).apply {
                 setTextIsSelectable(true)
             },
         )
