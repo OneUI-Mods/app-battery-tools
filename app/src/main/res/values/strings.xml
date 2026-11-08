@@ -51,4 +51,13 @@ Hook: %2$s
 %3$s</string>
   <string name="windows_name">Link to Windows</string>
   <string name="sesame_name">Sesame</string>
+  <string name="weather_timer">Stop the old sensor timer when disabled or rescheduled</string>
+  <string name="weather_timer_detail">Cancels the WxBeacon2 timer before its reference is cleared. Other weather updates and notifications are retained. Applies when changing the sensor setting after loading this hook.</string>
+  <string name="smartthings_release">Release mDNS locks when discovery fails before handoff</string>
+  <string name="smartthings_release_detail">Returns newly created discovery locks if startup is abandoned before cleanup is registered. Locks adopted by concurrent discovery are retained.</string>
+  <string name="tapo_release">Release the acquisition when Matter discovery cannot start</string>
+  <string name="tapo_release_detail">Rolls back only the multicast lock acquisition made by a failed startup. Existing and successful discovery retain their normal lifecycle.</string>
+  <string name="simeji_anr">Stop the diagnostic SDK’s recurring ANR polling</string>
+  <string name="simeji_anr_detail">Prevents the reviewed diagnostic SDK from registering its 500 ms ANR polling task. That SDK’s new ANR reports are unavailable. Typing, conversion, themes and application crash handling are retained.</string>
+  <string name="weather_name">Weathernews</string>
 </resources>

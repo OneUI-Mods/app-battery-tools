@@ -52,4 +52,13 @@
 %3$s</string>
   <string name="windows_name">Windowsにリンク</string>
   <string name="sesame_name">セサミ</string>
+  <string name="weather_timer">センサー受信OFF・間隔変更時に古いタイマーを停止する</string>
+  <string name="weather_timer_detail">WxBeacon2の定期受信を止めるとき、参照が消える前にタイマーを終了します。天気更新や通知は維持します。フック読み込み後の設定変更から適用されます。</string>
+  <string name="smartthings_release">探索開始が中断したときのmDNSロックを解放する</string>
+  <string name="smartthings_release_detail">解放処理を登録する前に探索が中断した場合、新しく作った専用ロックを返します。同時に開始した別の探索へ引き継がれたロックは維持します。</string>
+  <string name="tapo_release">Matter探索の開始に失敗したときの取得分を解放する</string>
+  <string name="tapo_release_detail">探索開始が例外で失敗したとき、その呼び出しが取得したマルチキャストロックの参照だけを返します。既存の探索と正常に始まった探索は維持します。</string>
+  <string name="simeji_anr">診断SDKの定期的なANR監視を停止する</string>
+  <string name="simeji_anr_detail">確認済みの診断SDKによる500ms周期のANR監視の登録を止めます。そのSDKの新しいANRレポートは取得されなくなります。文字入力・変換・テーマ・アプリのクラッシュ処理は維持します。</string>
+  <string name="weather_name">ウェザーニュース</string>
 </resources>

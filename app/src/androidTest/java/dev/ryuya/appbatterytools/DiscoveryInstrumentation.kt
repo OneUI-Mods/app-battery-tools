@@ -6,8 +6,11 @@ import dalvik.system.DexClassLoader
 import java.io.File
 import java.lang.reflect.Proxy
 import java.time.Duration
+import java.util.Timer
+import java.util.TimerTask
 import java.util.concurrent.atomic.AtomicInteger
 import org.json.JSONObject
+import org.luckypray.dexkit.wrap.DexField
 import org.luckypray.dexkit.wrap.DexMethod
 
 /** Parses private, supplied APK fixtures; never starts the third-party applications. */
@@ -20,7 +23,16 @@ class DiscoveryInstrumentation : Instrumentation() {
     override fun onStart() {
         val result = JSONObject()
         var successful = true
-        for (name in listOf(Targets.WINDOWS, Targets.EQ, Targets.ECOVACS)) {
+        for (name in
+            listOf(
+                Targets.WINDOWS,
+                Targets.EQ,
+                Targets.ECOVACS,
+                Targets.WEATHER,
+                Targets.SMARTTHINGS,
+                Targets.TAPO,
+                Targets.SIMEJI,
+            )) {
             try {
                 val file = File(targetContext.filesDir, "fixtures/$name.apk")
                 check(file.isFile)
@@ -28,6 +40,9 @@ class DiscoveryInstrumentation : Instrumentation() {
                 result.put(name, JSONObject(bindings))
                 if (name == Targets.WINDOWS) verifyWindowsHandoff(file, bindings)
                 if (name == Targets.EQ) verifyRouteIdentity(file, bindings)
+                if (name == Targets.WEATHER) verifyWeatherStop(file, bindings)
+                if (name in listOf(Targets.SMARTTHINGS, Targets.TAPO, Targets.SIMEJI))
+                    verifyCleanupBindings(file, bindings)
             } catch (error: Throwable) {
                 successful = false
                 result.put(name, error.stackTraceToString().take(4000))
@@ -35,6 +50,70 @@ class DiscoveryInstrumentation : Instrumentation() {
         }
         val output = Bundle().apply { putString("result", result.toString()) }
         finish(if (successful) -1 else 0, output)
+    }
+
+    private fun verifyCleanupBindings(file: File, bindings: Map<String, String?>) {
+        val loader = loader(file)
+        for ((key, value) in bindings) {
+            if (key == "contract" || value == null) continue
+            for (descriptor in value.lines()) {
+                if (descriptor.contains("(")) DexMethod(descriptor).getMethodInstance(loader)
+                else DexField(descriptor).getFieldInstance(loader)
+            }
+        }
+    }
+
+    /** Invoke the real APK stop method on an unattached, empty Application. Never run onCreate. */
+    private fun verifyWeatherStop(file: File, bindings: Map<String, String?>) {
+        val loader = loader(file)
+        val stop =
+            DexMethod(checkNotNull(bindings["weather_stop"])).getMethodInstance(loader).apply {
+                isAccessible = true
+            }
+        val field =
+            DexField(checkNotNull(bindings["weather_timer"])).getFieldInstance(loader).apply {
+                isAccessible = true
+            }
+        val unsafeType = Class.forName("sun.misc.Unsafe")
+        val unsafe =
+            unsafeType.getDeclaredField("theUnsafe").apply { isAccessible = true }.get(null)
+        val app =
+            unsafeType
+                .getMethod("allocateInstance", Class::class.java)
+                .invoke(unsafe, stop.declaringClass)
+        fun task() =
+            object : TimerTask() {
+                override fun run() = Unit
+            }
+        val original = Timer("OriginalWeatherStopProbe", true)
+        try {
+            original.scheduleAtFixedRate(task(), 3_600_000, 3_600_000)
+            field.set(app, original)
+            stop.invoke(app)
+            check(field.get(app) == null)
+            original.schedule(task(), 3_600_000) // Reproduce: original stop did not cancel.
+        } finally {
+            original.cancel()
+        }
+        val fixed = Timer("FixedWeatherStopProbe", true)
+        try {
+            fixed.scheduleAtFixedRate(task(), 3_600_000, 3_600_000)
+            field.set(app, fixed)
+            val cleanup = OwnedTimerCleanup(field)
+            check(cleanup.beforeStop(app))
+            stop.invoke(app)
+            check(field.get(app) == null)
+            check(!cleanup.beforeStop(app))
+            var cancelled = false
+            try {
+                fixed.schedule(task(), 3_600_000)
+            } catch (_: IllegalStateException) {
+                cancelled = true
+            }
+            check(cancelled)
+        } finally {
+            fixed.cancel()
+        }
     }
 
     private fun loader(file: File): DexClassLoader {

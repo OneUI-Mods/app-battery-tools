@@ -6,6 +6,10 @@
         <package android:name="co.candyhouse.sesame2" />
         <package android:name="rakkashin.earpieceeq" />
         <package android:name="com.eco.global.app" />
+        <package android:name="wni.WeathernewsTouch.jp" />
+        <package android:name="com.samsung.android.oneconnect" />
+        <package android:name="com.tplink.iot" />
+        <package android:name="com.adamrocker.android.input.simeji" />
     </queries>
     <application android:name=".ModuleApplication" android:label="@string/app_name"
         android:description="@string/description" android:icon="@drawable/ic_launcher"

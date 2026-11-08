@@ -39,3 +39,5 @@ Application.attach後、既存のApplication実体、InstrumentationのonCreate�
 実機の連続外部起動で、startForegroundを省いて即stopSelfにするとForegroundServiceDidNotStartInTimeExceptionが発生した。試行中の版は公開せず、外部起動では純正のforeground準備を完了してから停止する方式へ修正した。設定OFFイベントで止める対象も、純正onStartCommandが完了した実体に限る。位置登録の追跡・解除はその実体にだけ対応付ける。修正後の複数回起動と12秒の待機で、同一PIDの維持とGPS停止を確認した。
 
 追加機能を含めたJVMテストは49件です。Android 16/17のAPK照合・模擬通信・UI確認は[0.2.0の検証](testing-0.2.0.md)へ記録します。
+
+0.3.0のJVMテストは65件です。追加の所有関係・取得分の返却と、Android 16/17の実APK照合・実タイマー停止検証は[0.3.0の検証](testing-0.3.0.md)へ記録します。

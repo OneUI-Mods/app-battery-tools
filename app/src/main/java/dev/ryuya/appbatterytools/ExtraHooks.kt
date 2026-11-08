@@ -57,6 +57,10 @@ internal class ExtraHooks(
                 }
                 Targets.EQ -> equalizer(config)
                 Targets.ECOVACS -> ecovacs(config)
+                Targets.WEATHER,
+                Targets.SMARTTHINGS,
+                Targets.TAPO,
+                Targets.SIMEJI -> CleanupHooks(module, context, report, ::changed).install(config)
             }
             report("active", null, null)
         } catch (failure: Throwable) {

@@ -18,6 +18,10 @@ internal object ExtraDiscovery {
                 Targets.WINDOWS -> windows(bridge)
                 Targets.EQ -> equalizer(bridge)
                 Targets.ECOVACS -> ecovacs(bridge)
+                Targets.WEATHER,
+                Targets.SMARTTHINGS,
+                Targets.TAPO,
+                Targets.SIMEJI -> CleanupDiscovery.explore(packageName, bridge)
                 else -> error("Unknown target")
             }
         }

@@ -25,6 +25,10 @@ object Targets {
     const val SESAME = "co.candyhouse.sesame2"
     const val EQ = "rakkashin.earpieceeq"
     const val ECOVACS = "com.eco.global.app"
+    const val WEATHER = "wni.WeathernewsTouch.jp"
+    const val SMARTTHINGS = "com.samsung.android.oneconnect"
+    const val TAPO = "com.tplink.iot"
+    const val SIMEJI = "com.adamrocker.android.input.simeji"
     val all =
         listOf(
             Target(
@@ -77,6 +81,38 @@ object Targets {
                 "ecovacs-matter-release-v1",
                 R.string.ecovacs_detail,
                 listOf(Option("ecovacs_release", R.string.ecovacs_release)),
+            ),
+            Target(
+                WEATHER,
+                "Weathernews",
+                "6ccb0ee3a9839b5a7c2b0e1eb8a744b73c730a4695863407efda6f92dd1798d9",
+                "weather-owned-timer-v1",
+                R.string.weather_timer_detail,
+                listOf(Option("weather_timer", R.string.weather_timer)),
+            ),
+            Target(
+                SMARTTHINGS,
+                "SmartThings",
+                "34df0e7a9f1cf1892e45c056b4973cd81ccf148a4050d11aea4ac5a65f900a42",
+                "smartthings-mdns-handoff-v1",
+                R.string.smartthings_release_detail,
+                listOf(Option("smartthings_release", R.string.smartthings_release)),
+            ),
+            Target(
+                TAPO,
+                "Tapo",
+                "38eff43efb59313414fb442cee16399d48452e3c4b016cc1f2d073e815e243d7",
+                "tapo-failed-mdns-acquisition-v1",
+                R.string.tapo_release_detail,
+                listOf(Option("tapo_release", R.string.tapo_release)),
+            ),
+            Target(
+                SIMEJI,
+                "Simeji",
+                "4e5a78c0450316e38afab3ecb6bac9932c095f2b34360c40129857b78657e24f",
+                "simeji-sdk-anr-polling-v1",
+                R.string.simeji_anr_detail,
+                listOf(Option("simeji_anr", R.string.simeji_anr)),
             ),
         )
     val optionKeys
