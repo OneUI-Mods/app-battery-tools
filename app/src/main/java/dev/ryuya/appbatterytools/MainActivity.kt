@@ -121,6 +121,7 @@ class MainActivity : AppCompatActivity() {
                         "waiting",
                         "interrupted" -> R.string.state_preparing
                         "active" -> R.string.state_active
+                        "cleanup_partial" -> R.string.state_cleanup_partial
                         "wifi_paused" -> R.string.state_wifi_paused
                         "wifi_active" -> R.string.state_wifi_active
                         "removal_requested" -> R.string.state_removed

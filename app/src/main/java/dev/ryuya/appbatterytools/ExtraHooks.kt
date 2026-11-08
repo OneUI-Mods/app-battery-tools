@@ -57,6 +57,9 @@ internal class ExtraHooks(
                 }
                 Targets.EQ -> equalizer(config)
                 Targets.ECOVACS -> ecovacs(config)
+                Targets.LANDROP,
+                Targets.CONTINUITY ->
+                    LifecycleHooks(module, context, report, ::changed).install(config)
                 Targets.WEATHER,
                 Targets.SMARTTHINGS,
                 Targets.TAPO,

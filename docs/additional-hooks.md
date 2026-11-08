@@ -77,3 +77,13 @@ anr_reportsを扱う診断処理から初期化の呼び出し関係を追い、
 GoveeだけはApplication.attachとInstrumentationをフックせず、メインキューへ1回だけ準備処理を送る。周期リトライ・常駐監視は加えない。保護方式の全容やネイティブ検出の正確な条件を解明した、という意味ではない。
 
 この準備より前に開始されたBLE探索の一覧は列挙しない。そのような探索には次回登録から作用する。実際のWi-Fi切断／復帰と各機器の確認は別途必要で、起動確認を全動作の検証とは扱わない。
+
+## LANDrop（0.4.0）
+
+LifecycleDiscoveryが探索ロックの固有タグとacquire、所有フィールド、Flutterのエンジン設定・破棄・JNI終了の呼び出しを照合する。LifecycleHooksは同じMainActivityに限定して、元のonDestroy正常完了後にEngineShutdownPolicyを評価する。所有エンジン破棄の方針、JNI切断済み、同じロックの所有をすべて必要条件とする。キャッシュエンジン・生存中・不明・例外の場合は解放しない。pause/stopはフックしない。
+
+## Continuity Service（0.4.0）
+
+停止ログ、BluetoothLeScanner.stopScan、ExecutorService.shutdownNow、所有するスキャナーとコールバック群、同じ型のstartScanを一意に照合する。shutdownNowは親インターフェースExecutorServiceまたはScheduledExecutorServiceへの同じ引数・戻り型の参照を受け入れる。
+
+元の停止メソッド内だけ、ThreadLocalのスコープで所有するスキャナーとコールバックの同一性を確認する。ScopedStopBatchはこの組み合わせのExceptionだけ記録し、元のループの次の停止要求へ進める。異なる所有者・コールバック・VM/LinkageErrorは通す。コールバック数が256超・型不明では補正しない。正常終了と一部失敗は別の診断状態にし、失敗分を成功扱いしない。再試行・バックグラウンド監視は追加しない。

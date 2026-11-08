@@ -29,6 +29,8 @@ object Targets {
     const val SMARTTHINGS = "com.samsung.android.oneconnect"
     const val TAPO = "com.tplink.iot"
     const val SIMEJI = "com.adamrocker.android.input.simeji"
+    const val LANDROP = "app.landrop.landrop_flutter"
+    const val CONTINUITY = "com.samsung.android.mcfds"
     val all =
         listOf(
             Target(
@@ -113,6 +115,22 @@ object Targets {
                 "simeji-sdk-anr-polling-v1",
                 R.string.simeji_anr_detail,
                 listOf(Option("simeji_anr", R.string.simeji_anr)),
+            ),
+            Target(
+                LANDROP,
+                "LANDrop",
+                "0584d275bba139424710e7363a0466f985b3e520f418f39d97276392f30b95f9",
+                "landrop-finished-engine-lock-v1",
+                R.string.landrop_release_detail,
+                listOf(Option("landrop_release", R.string.landrop_release)),
+            ),
+            Target(
+                CONTINUITY,
+                "Continuity Service",
+                "34df0e7a9f1cf1892e45c056b4973cd81ccf148a4050d11aea4ac5a65f900a42",
+                "continuity-complete-stop-batch-v1",
+                R.string.continuity_cleanup_detail,
+                listOf(Option("continuity_cleanup", R.string.continuity_cleanup)),
             ),
         )
     val optionKeys

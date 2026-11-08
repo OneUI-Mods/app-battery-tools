@@ -153,6 +153,7 @@ class ModuleProvider : ContentProvider() {
                         "error",
                         "wifi_paused",
                         "wifi_active",
+                        "cleanup_partial",
                     ),
             )
             val error = input.getString("error", "").orEmpty().take(200)

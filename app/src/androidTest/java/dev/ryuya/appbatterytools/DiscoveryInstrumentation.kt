@@ -32,6 +32,8 @@ class DiscoveryInstrumentation : Instrumentation() {
                 Targets.SMARTTHINGS,
                 Targets.TAPO,
                 Targets.SIMEJI,
+                Targets.LANDROP,
+                Targets.CONTINUITY,
             )) {
             try {
                 val file = File(targetContext.filesDir, "fixtures/$name.apk")
@@ -42,8 +44,18 @@ class DiscoveryInstrumentation : Instrumentation() {
                 if (name == Targets.WINDOWS) verifyWindowsHandoff(file, bindings)
                 if (name == Targets.EQ) verifyRouteIdentity(file, bindings)
                 if (name == Targets.WEATHER) verifyWeatherStop(file, bindings)
-                if (name in listOf(Targets.SMARTTHINGS, Targets.TAPO, Targets.SIMEJI))
+                if (
+                    name in
+                        listOf(
+                            Targets.SMARTTHINGS,
+                            Targets.TAPO,
+                            Targets.SIMEJI,
+                            Targets.LANDROP,
+                            Targets.CONTINUITY,
+                        )
+                )
                     verifyCleanupBindings(file, bindings)
+                if (name == Targets.LANDROP) verifyFlutterNativeState(file, bindings)
             } catch (error: Throwable) {
                 successful = false
                 result.put(name, error.stackTraceToString().take(4000))
@@ -51,6 +63,35 @@ class DiscoveryInstrumentation : Instrumentation() {
         }
         val output = Bundle().apply { putString("result", result.toString()) }
         finish(if (successful) -1 else 0, output)
+    }
+
+    private fun verifyFlutterNativeState(file: File, bindings: Map<String, String?>) {
+        val loader = loader(file)
+        val attached =
+            DexMethod(checkNotNull(bindings["landrop_attached"])).getMethodInstance(loader)
+        val unsafeType = Class.forName("sun.misc.Unsafe")
+        val unsafe =
+            unsafeType.getDeclaredField("theUnsafe").apply { isAccessible = true }.get(null)
+        // An isolated empty Java wrapper, never attached to a native Flutter engine.
+        val jni =
+            unsafeType
+                .getMethod("allocateInstance", Class::class.java)
+                .invoke(unsafe, attached.declaringClass)
+        val handle =
+            attached.declaringClass.declaredFields
+                .single { it.type == java.lang.Long::class.java }
+                .apply { isAccessible = true }
+        check(attached.invoke(jni) == false)
+        check(EngineShutdownPolicy.mayRelease(true, true, attached.invoke(jni) as Boolean, true))
+        try {
+            handle.set(jni, 1L)
+            check(attached.invoke(jni) == true)
+            check(
+                !EngineShutdownPolicy.mayRelease(true, true, attached.invoke(jni) as Boolean, true),
+            )
+        } finally {
+            handle.set(jni, null)
+        }
     }
 
     private fun verifyCleanupBindings(file: File, bindings: Map<String, String?>) {

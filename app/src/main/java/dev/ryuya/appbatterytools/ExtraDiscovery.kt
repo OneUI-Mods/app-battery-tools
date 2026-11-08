@@ -18,6 +18,8 @@ internal object ExtraDiscovery {
                 Targets.WINDOWS -> windows(bridge)
                 Targets.EQ -> equalizer(bridge)
                 Targets.ECOVACS -> ecovacs(bridge)
+                Targets.LANDROP,
+                Targets.CONTINUITY -> LifecycleDiscovery.explore(packageName, bridge)
                 Targets.WEATHER,
                 Targets.SMARTTHINGS,
                 Targets.TAPO,

@@ -62,4 +62,9 @@
   <string name="simeji_anr_detail">確認済みの診断SDKによる500ms周期のANR監視の登録を止めます。そのSDKの新しいANRレポートは取得されなくなります。文字入力・変換・テーマ・アプリのクラッシュ処理は維持します。</string>
   <string name="weather_name">ウェザーニュース</string>
   <string name="govee_detail">Wi-Fi未接続中のBLE探索を一時停止し、再接続で要求を再開します。既存のBluetooth接続は維持します。起動保護との競合を避けて起動処理後に準備するため、それ以前に始まった探索には次の登録から作用します。モバイル回線だけの間は機器検出が使えない場合があります。</string>
+  <string name="landrop_release">エンジン終了後の探索ロックを解放する</string>
+  <string name="landrop_release_detail">Activityが所有するFlutterエンジンの終了を確認してから、その画面の探索用ロックを返します。バックグラウンドを含め、エンジンが動いている間の転送・探索は維持します。</string>
+  <string name="continuity_cleanup">一部の停止エラーで残りのスキャン停止を中断しない</string>
+  <string name="continuity_cleanup_detail">Continuity Serviceが探索を終了するとき、一部の停止要求に失敗しても残りの停止要求を続けます。接続中の機器を切断したり、通常の探索を変更したりしません。</string>
+  <string name="state_cleanup_partial">一部の停止要求でエラー・残りの要求は継続</string>
 </resources>

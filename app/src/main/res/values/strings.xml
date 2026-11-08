@@ -61,4 +61,9 @@ Hook: %2$s
   <string name="simeji_anr_detail">Prevents the reviewed diagnostic SDK from registering its 500 ms ANR polling task. That SDK’s new ANR reports are unavailable. Typing, conversion, themes and application crash handling are retained.</string>
   <string name="weather_name">Weathernews</string>
   <string name="govee_detail">Pauses BLE discovery while disconnected from Wi-Fi and resumes requests when Wi-Fi reconnects. Existing Bluetooth connections remain. To coexist with the protected startup, preparation runs after application creation; scans already started before preparation are covered from their next registration. Discovery may be unavailable on mobile data alone.</string>
+  <string name="landrop_release">Release the discovery lock after the engine finishes</string>
+  <string name="landrop_release_detail">Returns the Activity’s discovery lock only after its owned Flutter engine has completed native teardown. Transfers and discovery while the engine remains alive are retained, including background use.</string>
+  <string name="continuity_cleanup">Continue other scan-stop requests after an individual error</string>
+  <string name="continuity_cleanup_detail">When Continuity Service ends its own discovery batch, a failed stop no longer prevents its remaining callbacks from receiving their stop requests. Does not disconnect devices or alter normal discovery.</string>
+  <string name="state_cleanup_partial">Some stop requests failed; remaining requests continued</string>
 </resources>
