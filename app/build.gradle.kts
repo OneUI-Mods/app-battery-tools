@@ -11,7 +11,7 @@ android {
         applicationId = "dev.ryuya.appbatterytools"
         minSdk = 36
         targetSdk = 37
-        versionCode = 3
+        versionCode = 4
         versionName = "0.1.0"
     }
     buildFeatures { buildConfig = true }

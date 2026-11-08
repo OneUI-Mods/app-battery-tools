@@ -7,6 +7,7 @@ import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -16,6 +17,7 @@ import android.util.Log
 import io.github.libxposed.api.XposedInterface.HookHandle
 import io.github.libxposed.api.XposedModule
 import io.github.libxposed.api.XposedModuleInterface.PackageReadyParam
+import java.util.IdentityHashMap
 
 /** Only the area service owns cleanup. Original request parameters and results pass through. */
 class HookEntry : XposedModule() {
@@ -167,10 +169,24 @@ class HookEntry : XposedModule() {
             return AreaPolicy.shouldSuppress(settingsReviewed, stored)
         }
         val main = Handler(Looper.getMainLooper())
+        // Only entries whose original onStartCommand has completed can be stopped. An FGS
+        // start request must first satisfy the platform's startForeground deadline.
+        val promoted = IdentityHashMap<Service, Int>()
+        fun stopPromotedService(instance: Service, startId: Int) {
+            try {
+                instance.stopForeground(Service.STOP_FOREGROUND_REMOVE)
+                instance.stopSelf(startId)
+                report(context, "suppressed")
+            } catch (error: Exception) {
+                report(context, "error", error)
+            }
+        }
         val stopDisabledService = Runnable {
             if (suppressAreaService()) {
-                context.stopService(Intent(context, service))
-                report(context, "suppressed")
+                for ((instance, startId) in promoted.entries.toList()) stopPromotedService(
+                    instance,
+                    startId,
+                )
             }
         }
         val leases =
@@ -183,6 +199,22 @@ class HookEntry : XposedModule() {
             )
         val installed = mutableListOf<HookHandle>()
         try {
+            for (method in listOf("startForegroundService", "startService")) {
+                installed +=
+                    hook(ContextWrapper::class.java.getDeclaredMethod(method, Intent::class.java))
+                        .intercept { chain ->
+                            val component = (chain.args[0] as? Intent)?.component
+                            if (
+                                component?.packageName == Targets.DIGIPOLICE &&
+                                    component.className == service.name &&
+                                    suppressAreaService()
+                            ) {
+                                // No ServiceRecord is created, so no FGS deadline is armed.
+                                report(context, "suppressed")
+                                component
+                            } else chain.proceed()
+                        }
+            }
             installed +=
                 hook(register).intercept { chain ->
                     val current = owner.get()
@@ -203,22 +235,26 @@ class HookEntry : XposedModule() {
                 }
             installed +=
                 hook(start).intercept { chain ->
-                    val instance = checkNotNull(chain.thisObject)
-                    if (suppressAreaService()) {
-                        (instance as Service).stopSelf(chain.args[2] as Int)
-                        report(context, "suppressed")
-                        return@intercept Service.START_NOT_STICKY
-                    }
+                    val instance = chain.thisObject as Service
                     val previous = owner.get()
                     if (healthy) {
                         leases.start(instance)
                         owner.set(instance)
                     }
-                    try {
-                        chain.proceed()
-                    } finally {
-                        owner.set(previous)
-                    }
+                    val result =
+                        try {
+                            chain.proceed()
+                        } finally {
+                            owner.set(previous)
+                        }
+                    val startId = chain.args[2] as Int
+                    promoted[instance] = startId
+                    if (suppressAreaService()) {
+                        // Sticky/system/external starts bypass ContextWrapper interception.
+                        // Preserve native foreground setup before removing this service.
+                        stopPromotedService(instance, startId)
+                        Service.START_NOT_STICKY
+                    } else result
                 }
             installed +=
                 hook(destroy).intercept { chain ->
@@ -226,6 +262,7 @@ class HookEntry : XposedModule() {
                         chain.proceed()
                     } finally {
                         if (service.isInstance(chain.thisObject)) {
+                            promoted.remove(chain.thisObject)
                             val result = leases.stop(checkNotNull(chain.thisObject))
                             if (result.requested > 0 && result.failed == 0)
                                 report(context, "removal_requested", released = result.requested)
@@ -241,7 +278,6 @@ class HookEntry : XposedModule() {
                         }
                     }
                 preferences.registerOnSharedPreferenceChangeListener(areaSettingsListener)
-                if (suppressAreaService()) main.post(stopDisabledService)
             }
             report(context, "active")
         } catch (error: Throwable) {
