@@ -1,6 +1,7 @@
 package dev.ryuya.appbatterytools
 
 import android.app.Application
+import android.app.Instrumentation
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -10,36 +11,54 @@ import android.os.Handler
 import android.os.Looper
 import io.github.libxposed.api.XposedInterface.HookHandle
 import io.github.libxposed.api.XposedModule
-import io.github.libxposed.api.XposedModuleInterface.ModuleLoadedParam
 import io.github.libxposed.api.XposedModuleInterface.PackageReadyParam
 
 /** Only the area service owns cleanup. Original request parameters and results pass through. */
 class HookEntry : XposedModule() {
-    private var processName = ""
     private var areaSettingsListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
-
-    override fun onModuleLoaded(param: ModuleLoadedParam) {
-        processName = param.processName
-    }
+    private var lifecyclePrepared = false
 
     override fun onPackageReady(param: PackageReadyParam) {
         if (
-            !param.isFirstPackage ||
+            lifecyclePrepared ||
                 param.packageName != Targets.DIGIPOLICE ||
-                processName != Targets.DIGIPOLICE
+                Application.getProcessName() != Targets.DIGIPOLICE
         )
             return
-        hook(Application::class.java.getDeclaredMethod("attach", Context::class.java)).intercept {
-            chain ->
-            val context = chain.args[0] as Context
+        lifecyclePrepared = true
+        val application =
             try {
-                install(context)
-            } catch (error: Exception) {
-                report(context, "error", error)
-            } catch (error: LinkageError) {
-                report(context, "error", error)
+                Class.forName("android.app.ActivityThread")
+                    .getDeclaredMethod("currentApplication")
+                    .invoke(null) as? Application
+            } catch (_: ReflectiveOperationException) {
+                null
             }
-            chain.proceed()
+        if (application?.baseContext != null && application.packageName == Targets.DIGIPOLICE) {
+            initialize(application)
+            return
+        }
+        // API 102 PackageReady can arrive after Application.attach. Instrumentation still owns
+        // the subsequent onCreate call, including for applications overriding onCreate.
+        hook(
+                Instrumentation::class
+                    .java
+                    .getDeclaredMethod("callApplicationOnCreate", Application::class.java),
+            )
+            .intercept { chain ->
+                val context = chain.args[0] as Application
+                initialize(context)
+                chain.proceed()
+            }
+    }
+
+    private fun initialize(context: Context) {
+        try {
+            install(context)
+        } catch (error: Exception) {
+            report(context, "error", error)
+        } catch (error: LinkageError) {
+            report(context, "error", error)
         }
     }
 
