@@ -59,7 +59,7 @@ internal class CleanupHooks(
     }
 
     private fun weather(config: Bundle) {
-        val timer = OwnedTimerCleanup(field(config, "weather_timer"))
+        val timer = OwnedTimerCleanup(field(config, "weather_timer_field"))
         handles +=
             module.hook(method(config, "weather_stop")).intercept { chain ->
                 safely {

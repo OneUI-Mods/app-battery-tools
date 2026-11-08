@@ -37,6 +37,7 @@ class DiscoveryInstrumentation : Instrumentation() {
                 val file = File(targetContext.filesDir, "fixtures/$name.apk")
                 check(file.isFile)
                 val bindings = ExtraDiscovery.explore(name, file.path)
+                DiscoveryBindings.checked(bindings, Targets.optionKeys)
                 result.put(name, JSONObject(bindings))
                 if (name == Targets.WINDOWS) verifyWindowsHandoff(file, bindings)
                 if (name == Targets.EQ) verifyRouteIdentity(file, bindings)
@@ -71,7 +72,7 @@ class DiscoveryInstrumentation : Instrumentation() {
                 isAccessible = true
             }
         val field =
-            DexField(checkNotNull(bindings["weather_timer"])).getFieldInstance(loader).apply {
+            DexField(checkNotNull(bindings["weather_timer_field"])).getFieldInstance(loader).apply {
                 isAccessible = true
             }
         val unsafeType = Class.forName("sun.misc.Unsafe")

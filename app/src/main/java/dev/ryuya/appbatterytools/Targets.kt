@@ -86,7 +86,7 @@ object Targets {
                 WEATHER,
                 "Weathernews",
                 "6ccb0ee3a9839b5a7c2b0e1eb8a744b73c730a4695863407efda6f92dd1798d9",
-                "weather-owned-timer-v1",
+                "weather-owned-timer-v2",
                 R.string.weather_timer_detail,
                 listOf(Option("weather_timer", R.string.weather_timer)),
             ),

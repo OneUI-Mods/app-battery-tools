@@ -94,10 +94,13 @@ class ModuleProvider : ContentProvider() {
                 val resolved =
                     store(target).readOrExplore(identity.generation) {
                         slot.searches.incrementAndGet()
-                        (if (target.packageName == Targets.DIGIPOLICE)
-                            DigiPoliceDiscovery.explore(identity.apk, identity.files)
-                        else ExtraDiscovery.explore(target.packageName, identity.apk)) +
-                            ("apk" to identity.apk)
+                        DiscoveryBindings.checked(
+                            (if (target.packageName == Targets.DIGIPOLICE)
+                                DigiPoliceDiscovery.explore(identity.apk, identity.files)
+                            else ExtraDiscovery.explore(target.packageName, identity.apk)) +
+                                ("apk" to identity.apk),
+                            Targets.optionKeys,
+                        )
                     }
                 slot.result = identity.generation to resolved
             } finally {

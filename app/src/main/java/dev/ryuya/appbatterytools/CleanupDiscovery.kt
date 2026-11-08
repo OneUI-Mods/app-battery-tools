@@ -50,7 +50,7 @@ internal object CleanupDiscovery {
         return mapOf(
             "contract" to "weather-owned-timer",
             "weather_stop" to stop.descriptor,
-            "weather_timer" to field.descriptor,
+            "weather_timer_field" to field.descriptor,
         )
     }
 
