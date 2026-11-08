@@ -31,8 +31,17 @@ object Targets {
     const val SIMEJI = "com.adamrocker.android.input.simeji"
     const val LANDROP = "app.landrop.landrop_flutter"
     const val CONTINUITY = "com.samsung.android.mcfds"
+    const val SEAD = "com.samsung.android.sead"
     val all =
         listOf(
+            Target(
+                SEAD,
+                "Samsung display adjustment",
+                "34df0e7a9f1cf1892e45c056b4973cd81ccf148a4050d11aea4ac5a65f900a42",
+                "sead-camera-idle-worker-v1",
+                R.string.sead_detail,
+                listOf(Option("sead_idle", R.string.sead_idle)),
+            ),
             Target(
                 DIGIPOLICE,
                 "Digi Police",

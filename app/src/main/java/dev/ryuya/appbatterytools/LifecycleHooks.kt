@@ -45,12 +45,41 @@ internal class LifecycleHooks(
             when (context.packageName) {
                 Targets.LANDROP -> landrop(config)
                 Targets.CONTINUITY -> continuity(config)
+                Targets.SEAD -> cameraWorker(config)
                 else -> error("Unknown lifecycle target")
             }
         } catch (failure: Throwable) {
             hooks.asReversed().forEach { runCatching { it.unhook() } }
             throw failure
         }
+    }
+
+    private fun cameraWorker(config: Bundle) {
+        val executor = field(config, "sead_executor_field")
+        val factory =
+            field(config, "sead_factory_field").get(null) as? java.util.concurrent.ThreadFactory
+        checkNotNull(factory)
+        // Verify Vector's trusted module can see the platform delegate before claiming active.
+        // No task is submitted, so this probe creates no worker thread.
+        val probe = java.util.concurrent.Executors.newSingleThreadExecutor(factory)
+        try {
+            checkNotNull(IdleCameraWorker.unwrap(probe)) { "Camera executor access unavailable" }
+        } finally {
+            probe.shutdown()
+        }
+        hooks +=
+            module.hook(method(config, "sead_closed")).intercept { chain ->
+                val result = chain.proceed()
+                safely {
+                    val device = chain.args[0]
+                    if (
+                        executor.declaringClass.isInstance(device) &&
+                            IdleCameraWorker.retire(executor.get(device), factory)
+                    )
+                        changed()
+                }
+                result
+            }
     }
 
     private fun landrop(config: Bundle) {

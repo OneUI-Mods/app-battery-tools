@@ -67,4 +67,7 @@
   <string name="continuity_cleanup">一部の停止エラーで残りのスキャン停止を中断しない</string>
   <string name="continuity_cleanup_detail">Continuity Serviceが探索を終了するとき、一部の停止要求に失敗しても残りの停止要求を続けます。接続中の機器を切断したり、通常の探索を変更したりしません。</string>
   <string name="state_cleanup_partial">一部の停止要求でエラー・残りの要求は継続</string>
+  <string name="sead_name">Samsungの表示調整</string>
+  <string name="sead_idle">カメラ終了後の待機スレッドを休止する</string>
+  <string name="sead_detail">表示調整用カメラの終了後、専用スレッドを1秒の待機で休止できるようにします。予約済みのコールバックと後から届く処理は維持します。カメラの測定頻度・表示調整・動作中のカメラは変更しません。</string>
 </resources>

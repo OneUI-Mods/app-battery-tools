@@ -66,4 +66,7 @@ Hook: %2$s
   <string name="continuity_cleanup">Continue other scan-stop requests after an individual error</string>
   <string name="continuity_cleanup_detail">When Continuity Service ends its own discovery batch, a failed stop no longer prevents its remaining callbacks from receiving their stop requests. Does not disconnect devices or alter normal discovery.</string>
   <string name="state_cleanup_partial">Some stop requests failed; remaining requests continued</string>
+  <string name="sead_name">Samsung display adjustment</string>
+  <string name="sead_idle">Retire idle workers after the camera closes</string>
+  <string name="sead_detail">After display adjustment finishes using a camera, its private worker may stop after one idle second. Queued callbacks and future submissions remain valid. Camera sampling, display adjustment and active camera workers are retained.</string>
 </resources>

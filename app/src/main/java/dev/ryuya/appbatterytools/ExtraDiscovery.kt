@@ -7,7 +7,11 @@ import org.luckypray.dexkit.DexKitBridge
 /** Semantic proofs are serialized once per installed generation, never scanned in a hook. */
 internal object ExtraDiscovery {
     @SuppressLint("DuplicateCreateDexKit") // Provider's durable generation cache calls this once.
-    fun explore(packageName: String, apk: String): Map<String, String?> {
+    fun explore(
+        packageName: String,
+        apk: String,
+        framework: String = CameraWorkerDiscovery.FRAMEWORK,
+    ): Map<String, String?> {
         // These two policies own Android BLE registrations, not protected/obfuscated app methods.
         if (packageName == Targets.GOVEE || packageName == Targets.SESAME)
             return mapOf("contract" to "android-ble-wifi")
@@ -18,6 +22,7 @@ internal object ExtraDiscovery {
                 Targets.WINDOWS -> windows(bridge)
                 Targets.EQ -> equalizer(bridge)
                 Targets.ECOVACS -> ecovacs(bridge)
+                Targets.SEAD -> CameraWorkerDiscovery.explore(bridge, framework)
                 Targets.LANDROP,
                 Targets.CONTINUITY -> LifecycleDiscovery.explore(packageName, bridge)
                 Targets.WEATHER,

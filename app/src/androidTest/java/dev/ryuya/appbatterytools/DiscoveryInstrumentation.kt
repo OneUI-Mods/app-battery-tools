@@ -34,11 +34,17 @@ class DiscoveryInstrumentation : Instrumentation() {
                 Targets.SIMEJI,
                 Targets.LANDROP,
                 Targets.CONTINUITY,
+                Targets.SEAD,
             )) {
             try {
                 val file = File(targetContext.filesDir, "fixtures/$name.apk")
                 check(file.isFile)
-                val bindings = ExtraDiscovery.explore(name, file.path)
+                val bindings =
+                    ExtraDiscovery.explore(
+                        name,
+                        file.path,
+                        File(targetContext.filesDir, "fixtures/framework.apk").path,
+                    )
                 DiscoveryBindings.checked(bindings, Targets.optionKeys)
                 result.put(name, JSONObject(bindings))
                 if (name == Targets.WINDOWS) verifyWindowsHandoff(file, bindings)
@@ -56,6 +62,12 @@ class DiscoveryInstrumentation : Instrumentation() {
                 )
                     verifyCleanupBindings(file, bindings)
                 if (name == Targets.LANDROP) verifyFlutterNativeState(file, bindings)
+                if (name == Targets.SEAD) {
+                    DexMethod(checkNotNull(bindings["sead_closed"])).getMethodInstance(loader(file))
+                    verifyIdleCameraWorker()
+                    val missing = ExtraDiscovery.explore(name, file.path, file.path)
+                    check(missing == mapOf("contract" to "sead-private-worker-unavailable"))
+                }
             } catch (error: Throwable) {
                 successful = false
                 result.put(name, error.stackTraceToString().take(4000))
@@ -63,6 +75,37 @@ class DiscoveryInstrumentation : Instrumentation() {
         }
         val output = Bundle().apply { putString("result", result.toString()) }
         finish(if (successful) -1 else 0, output)
+    }
+
+    private fun verifyIdleCameraWorker() {
+        val factory =
+            java.util.concurrent.ThreadFactory {
+                Thread(it, "IdleCameraProbe").apply { isDaemon = true }
+            }
+        val executor = java.util.concurrent.Executors.newSingleThreadExecutor(factory)
+        try {
+            check(executor.submit<Int> { 1 }.get(3, java.util.concurrent.TimeUnit.SECONDS) == 1)
+            val pool = IdleCameraWorker.unwrap(executor)
+            checkNotNull(pool)
+            check(IdleCameraWorker.retire(executor, factory))
+            val poolSize = java.util.concurrent.atomic.AtomicInteger()
+            // Probe threads alone, without sampling any camera or starting a third-party app.
+            val deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(4)
+            do {
+                poolSize.set(
+                    Thread.getAllStackTraces().keys.count {
+                        it.name == "IdleCameraProbe" && it.isAlive
+                    },
+                )
+                if (poolSize.get() == 0) break
+                Thread.sleep(10)
+            } while (System.nanoTime() < deadline)
+            check(poolSize.get() == 0)
+            check(!executor.isShutdown)
+            check(executor.submit<Int> { 2 }.get(3, java.util.concurrent.TimeUnit.SECONDS) == 2)
+        } finally {
+            executor.shutdownNow()
+        }
     }
 
     private fun verifyFlutterNativeState(file: File, bindings: Map<String, String?>) {

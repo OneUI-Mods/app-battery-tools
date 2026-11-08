@@ -53,10 +53,16 @@ class ModuleProvider : ContentProvider() {
                 signers.any { GenerationStore.digestBytes(it.toByteArray()) == target.certificate },
             )
             val app = checkNotNull(info.applicationInfo)
-            val files = listOf(app.sourceDir) + app.splitSourceDirs.orEmpty()
+            val platform =
+                if (target.packageName == Targets.SEAD) listOf(CameraWorkerDiscovery.FRAMEWORK)
+                else emptyList()
+            val files = listOf(app.sourceDir) + app.splitSourceDirs.orEmpty() + platform
             Identity(
                 listOf(
-                        target.rule,
+                        target.rule +
+                            if (target.packageName == Targets.SEAD)
+                                ":${android.os.Build.FINGERPRINT}"
+                            else "",
                         info.longVersionCode,
                         info.lastUpdateTime,
                         target.certificate,

@@ -77,6 +77,7 @@ class MainActivity : AppCompatActivity() {
             Targets.WINDOWS -> getString(R.string.windows_name)
             Targets.SESAME -> getString(R.string.sesame_name)
             Targets.WEATHER -> getString(R.string.weather_name)
+            Targets.SEAD -> getString(R.string.sead_name)
             else -> target.name
         }
 

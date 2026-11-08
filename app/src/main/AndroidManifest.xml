@@ -12,6 +12,7 @@
         <package android:name="com.adamrocker.android.input.simeji" />
         <package android:name="app.landrop.landrop_flutter" />
         <package android:name="com.samsung.android.mcfds" />
+        <package android:name="com.samsung.android.sead" />
     </queries>
     <application android:name=".ModuleApplication" android:label="@string/app_name"
         android:description="@string/description" android:icon="@drawable/ic_launcher"

@@ -43,3 +43,5 @@ Application.attach後、既存のApplication実体、InstrumentationのonCreate�
 0.3.0のJVMテストは68件です。追加の所有関係・取得分の返却と、Android 16/17の実APK照合・実タイマー停止検証は[0.3.0の検証](testing-0.3.0.md)へ記録します。
 
 0.4.0のJVMテストは83件です。LANDropのエンジン所有・切断状態と、Continuityの同一所有者内の停止失敗の分離を追加しました。Android 16/17の9本の実APK照合、孤立したFlutterJNIの状態判定、12対象の設定画面の検証は[0.4.0の検証](testing-0.4.0.md)へ記録します。
+
+0.5.0はJVMテスト93件。OSのfingerprintとframework.jarを表示調整の解析世代に含める。既存12対象の世代は維持する。実装・信頼されたモジュールのアクセス条件は[0.5.0の検証](testing-0.5.0.md)へ記録する。

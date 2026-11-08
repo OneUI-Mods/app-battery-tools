@@ -60,6 +60,13 @@ internal class ExtraHooks(
                 Targets.LANDROP,
                 Targets.CONTINUITY ->
                     LifecycleHooks(module, context, report, ::changed).install(config)
+                Targets.SEAD -> {
+                    if (config.getString("contract") == "sead-private-worker-unavailable") {
+                        report("unsupported", null, null)
+                        return
+                    }
+                    LifecycleHooks(module, context, report, ::changed).install(config)
+                }
                 Targets.WEATHER,
                 Targets.SMARTTHINGS,
                 Targets.TAPO,

@@ -87,3 +87,7 @@ LifecycleDiscoveryが探索ロックの固有タグとacquire、所有フィー�
 停止ログ、BluetoothLeScanner.stopScan、ExecutorService.shutdownNow、所有するスキャナーとコールバック群、同じ型のstartScanを一意に照合する。shutdownNowは親インターフェースExecutorServiceまたはScheduledExecutorServiceへの同じ引数・戻り型の参照を受け入れる。
 
 元の停止メソッド内だけ、ThreadLocalのスコープで所有するスキャナーとコールバックの同一性を確認する。ScopedStopBatchはこの組み合わせのExceptionだけ記録し、元のループの次の停止要求へ進める。異なる所有者・コールバック・VM/LinkageErrorは通す。コールバック数が256超・型不明では補正しない。正常終了と一部失敗は別の診断状態にし、失敗分を成功扱いしない。再試行・バックグラウンド監視は追加しない。
+
+## 表示調整（0.5.0）
+
+CameraWorkerDiscoveryがSEADの終端コールバックと、同じOSのframework内の専用executor生成を照合する。IdleCameraWorkerは元のonClosedが正常終了した後だけ、所有者のThreadFactoryを同一性で検査し、初期設定の単一スレッドプールを待機1秒で休止可能にする。キュー・並列数・コールバック・カメラの測定頻度は維持する。詳細と非適用条件は[第5回](investigation/system-round5-2026-11-08.md)を参照。
