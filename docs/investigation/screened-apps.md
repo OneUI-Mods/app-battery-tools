@@ -2,12 +2,14 @@
 
 更新: 2026-11-08。以下は主に実機の電池統計での一次選別であり、APKを精査済みという意味ではありません。推定値は約14時間、消灯約7時間29分の記録です。各値は消費電力モデルによる割当で、削減可能量ではありません。
 
+追加のBLE・通信・APK調査は[第2回の調査結果](round2-2026-11-08.md)を参照してください。ECOVACS HOMEは表示名の照合とMatter経路の確認を済ませ、条件付き候補へ変更しました。Earpiece EQ・ReDiXiM Playは取得した導入版の処理を追加確認しています。
+
 | 対象パッケージ | 確認できたこと | 今の判断・再調査する条件 |
 | --- | --- | --- |
 | `com.google.android.gms` | 位置スキャナの起床アラームが多い。別アプリからの位置依頼を代理実行している | 位置依頼元の解除漏れを優先。FCMや全位置処理の一括制限は行わない |
 | `rakkashin.earpieceeq` | 消灯時CPU約3.62mAh | 音声処理を崩さず大改善できる根拠がないため見送り |
 | `com.digion.dixim.android.play.jcom.patched` | 消灯時Wi-Fi約3.45mAh | 小さい。不要な発見・接続ループが別途再現した場合に再調査 |
-| `com.eco.global.app` | 消灯時CPU約2.93mAh。アプリ表示名は未照合 | 大改善の根拠不足。全体CPU・キャッシュ状態だけで異常と決めない |
+| `com.eco.global.app` | 消灯時CPU約2.93mAh。追加照合でECOVACS HOMEと確認 | Matterロックの解放経路を追加調査。初回のCPU推定値だけでは問題を判定できなかった |
 | `io.homeassistant.companion.android` | センサーWorker、WebSocket、位置要求。消灯時のCPU等合計約2.25mAh | 通知・自動化の必要処理を削る案は不採用。今は見送り |
 | `org.kustom.widget` | 消灯時CPU約0.514mAh | 既存の表示・更新を遅くする変更は不要 |
 | `com.arlosoft.macrodroid` | 消灯時CPU約1.36mAh。現在の位置要求はPASSIVE | この位置要求自体を常時GPS稼働の原因とみなさない。自動化を維持する |
