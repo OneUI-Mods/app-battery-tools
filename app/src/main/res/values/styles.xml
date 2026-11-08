@@ -1,1 +1,20 @@
-<resources><style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar"><item name="colorPrimary">#326B53</item><item name="colorSecondary">#52635A</item><item name="android:windowLightStatusBar">?attr/isLightTheme</item></style><item type="id" name="settings_tabs" /></resources>
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
+    <item name="colorPrimary">#326B53</item>
+    <item name="colorOnPrimary">#FFFFFF</item>
+    <item name="colorPrimaryContainer">#B8F2CF</item>
+    <item name="colorOnPrimaryContainer">#0B3824</item>
+    <item name="colorSecondary">#52635A</item>
+    <item name="colorOnSecondary">#FFFFFF</item>
+    <item name="colorSecondaryContainer">#D5E8DB</item>
+    <item name="colorOnSecondaryContainer">#102119</item>
+    <item name="colorSurface">#F7FBF7</item>
+    <item name="colorOnSurface">#19211B</item>
+    <item name="colorOnSurfaceVariant">#424E46</item>
+    <item name="colorOutline">#727F75</item>
+    <item name="colorOutlineVariant">#C2CEC4</item>
+    <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
+  </style>
+  <item type="id" name="settings_tabs" />
+</resources>
