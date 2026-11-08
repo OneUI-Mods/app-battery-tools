@@ -200,7 +200,9 @@ internal class BleWifiHooks(
                         if (
                             !operational ||
                                 internal.get() == true ||
-                                chain.args[1] !is ScanSettings ||
+                                (chain.args[1] !is ScanSettings &&
+                                    !(tokenType == PendingIntent::class.java &&
+                                        chain.args[1] == null)) ||
                                 chain.args[2] == null ||
                                 !allowed()
                         )
@@ -213,9 +215,10 @@ internal class BleWifiHooks(
                                     main.post {
                                         token.onScanFailed(ScanCallback.SCAN_FAILED_ALREADY_STARTED)
                                     }
-                                return@intercept if (token is PendingIntent)
-                                    ScanCallback.SCAN_FAILED_ALREADY_STARTED
-                                else null
+                                // PendingIntent registration is accepted asynchronously by Android.
+                                // Keep the first desired request; duplicate callback scans still
+                                // fail.
+                                return@intercept if (token is PendingIntent) 0 else null
                             }
                             if (
                                 !registry.canAdd() ||
