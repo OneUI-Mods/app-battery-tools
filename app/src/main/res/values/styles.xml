@@ -1,0 +1,1 @@
+<resources><style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar"><item name="colorPrimary">#326B53</item><item name="colorSecondary">#52635A</item><item name="android:windowLightStatusBar">?attr/isLightTheme</item></style><item type="id" name="settings_tabs" /></resources>

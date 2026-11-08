@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="app_name">App Battery Tools</string>
+  <string name="description">過剰な電池消費を対象ごとに修正します。Vector / Xposed API 102が必要です。</string>
+  <string name="enable_module">省電力フックを使う</string>
+  <string name="setup">Vectorでこのモジュールを有効にし、対象にDigi Policeを選択してください。「状態」で解析完了を確認してからDigi Policeを再起動します。</string>
+  <string name="digi_fix">エリア通知終了時の測位を解除</string>
+  <string name="digi_detail">エリア通知サービスが終了したとき、そのサービスが登録した位置情報の受信処理だけを解除します。通知ON中の測位、地図、着信ブロックの動作は維持します。</string>
+  <string name="restart_hint">スイッチの変更はDigi Policeの再起動後に適用されます。OFFにすると次回起動から純正動作に戻ります。</string>
+  <string name="discovery_title">解析とフックの状態</string>
+  <string name="refresh">更新</string>
+  <string name="discovery_detail">DexKitの結果はこのアプリの内部データに保存します。探索は対象アプリの更新・解析ルール変更後の初回だけで、定期監視サービスは動かしません。</string>
+  <string name="legal_title">オープンソースライセンス</string>
+  <string name="legal_search">ライブラリを検索</string>
+  <string name="legal_open">ライセンスを表示</string>
+  <string name="back">戻る</string>
+  <string name="version">バージョン %1$s</string>
+  <string name="support">Android 16 / 17 · libxposed API 102
+Digi Police 3.7.0で経路を確認しています。更新版は契約を照合できた場合だけ適用します。</string>
+  <string name="state_ready">解析完了</string>
+  <string name="state_preparing">解析を準備中・少し待って更新してください</string>
+  <string name="state_active">フック読み込み済み</string>
+  <string name="state_removed">位置情報の解除を要求済み</string>
+  <string name="state_disabled">OFF</string>
+  <string name="state_restart">解析完了後にDigi Policeを再起動してください</string>
+  <string name="state_absent">対象アプリが未導入、または署名が未対応</string>
+  <string name="state_unsupported">適用見送り・解析またはフックの照合に失敗</string>
+  <string name="state_waiting">Digi Policeの起動待ち</string>
+  <string name="status_format">解析: %1$s
+フック: %2$s
+前回の解除要求: %3$d件
+%4$s</string>
+  <string name="tab_apps">アプリ</string>
+  <string name="tab_status">状態</string>
+  <string name="tab_about">情報</string>
+</resources>

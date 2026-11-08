@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="app_name">App Battery Tools</string>
+  <string name="description">Targeted battery fixes. Requires Vector / Xposed API 102.</string>
+  <string name="enable_module">Enable battery fixes</string>
+  <string name="setup">Enable this module in Vector and select Digi Police as its scope. Wait for analysis in Status, then restart Digi Police.</string>
+  <string name="digi_fix">Stop location updates when area notifications stop</string>
+  <string name="digi_detail">Releases only callbacks owned by the area service when it ends. Enabled area notifications, maps and call screening retain their original behavior.</string>
+  <string name="restart_hint">Changes apply after restarting Digi Police. Switching off restores original behavior on the next start.</string>
+  <string name="discovery_title">Discovery and hook status</string>
+  <string name="refresh">Refresh</string>
+  <string name="discovery_detail">DexKit results stay in this app’s private data. Discovery runs once per target update or rule revision. No polling service.</string>
+  <string name="legal_title">Open source licenses</string>
+  <string name="legal_search">Search libraries</string>
+  <string name="legal_open">View license</string>
+  <string name="back">Back</string>
+  <string name="version">Version %1$s</string>
+  <string name="support">Android 16 / 17 · libxposed API 102
+Digi Police 3.7.0 is reviewed. Updates are used only when their contracts match.</string>
+  <string name="state_ready">Analysis complete</string>
+  <string name="state_preparing">Preparing analysis; refresh shortly</string>
+  <string name="state_active">Hook loaded</string>
+  <string name="state_removed">Location cleanup requested</string>
+  <string name="state_disabled">Disabled</string>
+  <string name="state_restart">Restart Digi Police after analysis</string>
+  <string name="state_absent">Target missing or signer unsupported</string>
+  <string name="state_unsupported">Not applied: analysis or hook check failed</string>
+  <string name="state_waiting">Waiting for Digi Police</string>
+  <string name="status_format">Analysis: %1$s
+Hook: %2$s
+Last cleanup: %3$d callbacks
+%4$s</string>
+  <string name="tab_apps">Apps</string>
+  <string name="tab_status">Status</string>
+  <string name="tab_about">About</string>
+</resources>
