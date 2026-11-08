@@ -14,7 +14,23 @@ jobs:
       - uses: android-actions/setup-android@v3
         with:
           packages: platform-tools
+          log-accepted-android-sdk-licenses: false
       - run: sdkmanager 'platforms;android-37.0' 'build-tools;37.0.0'
+      - name: Bootstrap checksum-verified Gradle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="$(sed -n 's/^distributionUrl=.*gradle-\([0-9.]*\)-bin.zip$/\1/p' gradle/wrapper/gradle-wrapper.properties)"
+          expected="$(sed -n 's/^distributionSha256Sum=//p' gradle/wrapper/gradle-wrapper.properties)"
+          test -n "$version"
+          [[ "$expected" =~ ^[a-f0-9]{64}$ ]]
+          directory="$RUNNER_TEMP/verified-gradle"
+          mkdir -p "$directory"
+          # Same official archive and checksum as the wrapper, avoiding redirect gateway 504s.
+          gh release download "v$version" --repo gradle/gradle-distributions --pattern "gradle-$version-bin.zip" --dir "$directory"
+          echo "$expected  $directory/gradle-$version-bin.zip" | sha256sum --check
+          unzip -q "$directory/gradle-$version-bin.zip" -d "$directory"
+          echo "$directory/gradle-$version/bin" >> "$GITHUB_PATH"
       - uses: gradle/actions/setup-gradle@v4
-      - run: ./gradlew :app:testDebugUnitTest :app:assembleRelease :app:lintRelease :app:spotlessCheck :app:writeRuntimeDependencyList
+      - run: gradle :app:testDebugUnitTest :app:assembleRelease :app:lintRelease :app:spotlessCheck :app:writeRuntimeDependencyList --max-workers=2
       - run: python3 tools/check_license_catalog.py
