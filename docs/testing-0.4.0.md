@@ -13,7 +13,11 @@
 
 ## 実機・効果の範囲
 
-今回の調査は実機の統計読み取りとAPK取得に限定した。実機への更新・新規スコープの追加・対象プロセスの再読み込みは操作枠の確認後に行う。
+調査時の実機操作は統計読み取りとAPK取得に限定した。その後、ユーザーの操作枠の許可を受けて署名済みrelease 0.4.0（code 10）をインストールし、端末内APKのSHA-256一致を確認した。LANDropとContinuity ServiceをVectorスコープへ追加し、この2対象のプロセスだけを再読み込みした。Continuity Serviceのマニフェストに定義されたcom.samsung.android.ceも対象に含む。Bluetoothプロセスや無線全体は再起動していない。
+
+新規2対象ともdiscovery=ready・hostState=active・エラーなしを確認した。MIME種別取得による通常のApplication初期化だけで確認し、Activityや機器制御は操作していない。どちらも初回探索は1回で、キャッシュはモジュール自身の/data/user/0/dev.ryuya.appbatterytools/files/dexkit内に保存されていた。処理後のスレッド一覧で解析ワーカーが終了していることを確認した。
+
+boot ID、system_server、SystemUI、ホームのPID、SELinux、前面アプリはすべて維持された。OS・SystemUI・ホームの再起動、音声再生、認証・他アプリ設定の変更はしていない。
 
 追加2件の後始末が実機で現在漏れているとの観測や、長期の削減量は未確認。LANDropの実転送・バックグラウンド転送中の終了競合、Continuity接続中の機器との組み合わせについても、APK照合・純粋な所有関係テストと分ける。元の不要な状態が発生していなければ、この補正だけでは削減効果は出ない。
 
