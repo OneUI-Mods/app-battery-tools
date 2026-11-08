@@ -2,6 +2,8 @@
 
 対象はユーザーが指定したメモリ画面の「システム」全体で、system_server単体には限定しない。OS本体・SystemUI・ホーム・Samsungのシステムアプリを含む。
 
+その後の指定により、追加調査は**Samsungのシステムアプリ**へ絞った。カーネル、ZRAM、スラブの整理は対象外とする。[Samsungアプリの追加内訳](samsung-app-memory-2026-11-09.md)を参照。以下は前回までの記録であり、範囲変更後の新しい削減実績ではない。
+
 ## 集計の読み方
 
 実機frameworkのDebug.MemoryInfo.getTotalPssはdalvikPss + nativePss + otherPssにgetTotalSwappedOutPssを加えていた。従って、dumpsysのTOTAL PSSをすべて現在の物理RAM滞在量として扱わない。RSSをプロセス間で足すと共有ページが重複する。GPUのmtrack、カーネル、ZRAMも別の内訳を確認する。
