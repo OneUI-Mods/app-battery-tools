@@ -33,14 +33,19 @@ class HookEntry : XposedModule() {
         )
         if (lifecyclePrepared || Targets.find(param.packageName) == null) return
         lifecyclePrepared = true
-        val application =
-            try {
-                Class.forName("android.app.ActivityThread")
-                    .getDeclaredMethod("currentApplication")
-                    .invoke(null) as? Application
-            } catch (_: ReflectiveOperationException) {
-                null
+        if (param.packageName == Targets.GOVEE) {
+            // The protected bootstrap calls Application.attach reflectively for its real app.
+            // Do not intercept that bootstrap or Instrumentation. One queued callback runs
+            // after the synchronous application creation; it is not a polling loop.
+            Handler(Looper.getMainLooper()).post {
+                val ready = currentApplication()
+                if (ready?.baseContext != null && ready.packageName == Targets.GOVEE) {
+                    initialize(ready)
+                } else Log.w("AppBatteryTools", "Protected application was not ready")
             }
+            return
+        }
+        val application = currentApplication()
         if (application?.baseContext != null && Targets.find(application.packageName) != null) {
             initialize(application)
             return
@@ -64,6 +69,15 @@ class HookEntry : XposedModule() {
                 chain.proceed()
             }
     }
+
+    private fun currentApplication(): Application? =
+        try {
+            Class.forName("android.app.ActivityThread")
+                .getDeclaredMethod("currentApplication")
+                .invoke(null) as? Application
+        } catch (_: ReflectiveOperationException) {
+            null
+        }
 
     private fun initialize(context: Context) {
         if (initialized || Targets.find(context.packageName) == null) return

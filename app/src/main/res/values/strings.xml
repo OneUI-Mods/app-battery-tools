@@ -60,4 +60,5 @@ Hook: %2$s
   <string name="simeji_anr">Stop the diagnostic SDK’s recurring ANR polling</string>
   <string name="simeji_anr_detail">Prevents the reviewed diagnostic SDK from registering its 500 ms ANR polling task. That SDK’s new ANR reports are unavailable. Typing, conversion, themes and application crash handling are retained.</string>
   <string name="weather_name">Weathernews</string>
+  <string name="govee_detail">Pauses BLE discovery while disconnected from Wi-Fi and resumes requests when Wi-Fi reconnects. Existing Bluetooth connections remain. To coexist with the protected startup, preparation runs after application creation; scans already started before preparation are covered from their next registration. Discovery may be unavailable on mobile data alone.</string>
 </resources>

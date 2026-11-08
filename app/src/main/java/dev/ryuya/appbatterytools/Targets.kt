@@ -55,7 +55,7 @@ object Targets {
                 "Govee Home",
                 "94257a44978717e568b00c24bfcc385ec2f1cfeaf42885bbeb3232c94907eb43",
                 "framework-ble-wifi-v1",
-                R.string.ble_wifi_detail,
+                R.string.govee_detail,
                 listOf(Option("govee_wifi", R.string.ble_wifi)),
             ),
             Target(
