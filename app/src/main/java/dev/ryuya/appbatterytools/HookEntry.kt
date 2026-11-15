@@ -10,10 +10,12 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.content.SharedPreferences
+import android.database.ContentObserver
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import dev.ryuya.appbatterytools.startup.FirstUnlockGate
 import io.github.libxposed.api.XposedInterface.HookHandle
 import io.github.libxposed.api.XposedModule
 import io.github.libxposed.api.XposedModuleInterface.PackageReadyParam
@@ -24,7 +26,9 @@ class HookEntry : XposedModule() {
     private var areaSettingsListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
     private var lifecyclePrepared = false
     private var initialized = false
+    private val firstUnlock = FirstUnlockGate()
     private var accessRequested = false
+    private var discoveryObserver: ContentObserver? = null
 
     override fun onPackageReady(param: PackageReadyParam) {
         Log.i(
@@ -81,9 +85,13 @@ class HookEntry : XposedModule() {
 
     private fun initialize(context: Context) {
         if (initialized || Targets.find(context.packageName) == null) return
+        firstUnlock.run(context) { initializeUnlocked(context) }
+    }
+
+    private fun initializeUnlocked(context: Context) {
+        if (initialized) return
         try {
-            install(context)
-            initialized = true
+            tryInstall(context)
         } catch (error: Exception) {
             if (!accessRequested) {
                 accessRequested = true
@@ -102,8 +110,7 @@ class HookEntry : XposedModule() {
                     object : BroadcastReceiver() {
                         override fun onReceive(ignored: Context?, intent: Intent?) {
                             try {
-                                install(context)
-                                initialized = true
+                                tryInstall(context)
                             } catch (failure: Exception) {
                                 report(context, "error", failure)
                             }
@@ -120,16 +127,42 @@ class HookEntry : XposedModule() {
         }
     }
 
-    private fun install(context: Context) {
+    private fun tryInstall(context: Context) {
+        if (install(context)) {
+            initialized = true
+            discoveryObserver?.let(context.contentResolver::unregisterContentObserver)
+            discoveryObserver = null
+            return
+        }
+        if (discoveryObserver != null) return
+        val observer =
+            object : ContentObserver(Handler(Looper.getMainLooper())) {
+                override fun onChange(selfChange: Boolean) {
+                    initializeUnlocked(context)
+                }
+            }
+        context.contentResolver.registerContentObserver(ModuleProvider.URI, false, observer)
+        discoveryObserver = observer
+        // Covers discovery finishing between the first read and observer registration.
+        if (install(context)) {
+            initialized = true
+            context.contentResolver.unregisterContentObserver(observer)
+            discoveryObserver = null
+        }
+    }
+
+    private fun install(context: Context): Boolean {
         val config =
             context.contentResolver.call(ModuleProvider.URI, "settings", context.packageName, null)
         if (config == null || !config.getBoolean("ready")) {
-            report(context, "not_ready")
-            return
+            val pending =
+                config == null || DiscoveryReadiness.pending(config.getString("discovery"))
+            report(context, if (pending) "not_ready" else "unsupported")
+            return !pending
         }
         if (!config.getBoolean("enabled")) {
             report(context, "disabled")
-            return
+            return true
         }
         if (context.packageName != Targets.DIGIPOLICE) {
             check(config.getString("apk") == context.applicationInfo.sourceDir)
@@ -137,11 +170,11 @@ class HookEntry : XposedModule() {
                     report(context, state, error, count)
                 }
                 .install(config)
-            return
+            return true
         }
         if (!config.getBoolean("digipolice")) {
             report(context, "disabled")
-            return
+            return true
         }
         val loader = context.classLoader
         fun type(key: String) = Class.forName(checkNotNull(config.getString(key)), false, loader)
@@ -315,6 +348,7 @@ class HookEntry : XposedModule() {
             main.removeCallbacks(stopDisabledService)
             throw error
         }
+        return true
     }
 
     private fun report(
