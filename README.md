@@ -1,5 +1,7 @@
 # App Battery Tools
 
+[日本語](README.md) · [English](README.en.md)
+
 対象アプリごとの不要な電池消費を抑えるVector / Xposedモジュールです。Android 16／17、libxposed API 102に対応します。
 
 ## 対応機能
