@@ -12,6 +12,8 @@ class ConfigurationAccessReceiver : BroadcastReceiver() {
             intent.action == Intent.ACTION_BOOT_COMPLETED ||
                 intent.action == Intent.ACTION_MY_PACKAGE_REPLACED
         ) {
+            if (intent.action == Intent.ACTION_BOOT_COMPLETED && !BootSettings.enabled(context))
+                return
             ConfigurationAccess.grant(context)
         } else if (intent.action == ConfigurationAccess.REQUEST) {
             val knownUid =

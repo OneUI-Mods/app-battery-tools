@@ -70,4 +70,6 @@
   <string name="sead_name">Samsungの表示調整</string>
   <string name="sead_idle">カメラ終了後の待機スレッドを休止する</string>
   <string name="sead_detail">表示調整用カメラの終了後、専用スレッドを1秒の待機で休止できるようにします。予約済みのコールバックと後から届く処理は維持します。カメラの測定頻度・表示調整・動作中のカメラは変更しません。</string>
+    <string name="start_on_boot">端末起動時に自動起動</string>
+    <string name="start_on_boot_detail">初回ロック解除後に設定を準備します。OFFでも、対象アプリを開いたときの設定取得は引き続き使えます。</string>
 </resources>

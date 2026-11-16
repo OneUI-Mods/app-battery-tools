@@ -56,6 +56,18 @@ class MainActivity : AppCompatActivity() {
         diagnostics.addView(Ui.text(this, getString(R.string.discovery_detail)))
 
         val about = tabs.page(R.string.tab_about)
+        val startup = Ui.card(about)
+        startup.addView(
+            MaterialSwitch(this).apply {
+                setText(R.string.start_on_boot)
+                minHeight = (56 * resources.displayMetrics.density).toInt()
+                isChecked = BootSettings.enabled(this@MainActivity)
+                setOnCheckedChangeListener { _, checked ->
+                    BootSettings.setEnabled(this@MainActivity, checked)
+                }
+            },
+        )
+        startup.addView(Ui.text(this, getString(R.string.start_on_boot_detail)))
         val info = Ui.card(about)
         info.addView(Ui.text(this, getString(R.string.app_name), true))
         info.addView(Ui.text(this, getString(R.string.version, BuildConfig.VERSION_NAME)))

@@ -69,4 +69,6 @@ Hook: %2$s
   <string name="sead_name">Samsung display adjustment</string>
   <string name="sead_idle">Retire idle workers after the camera closes</string>
   <string name="sead_detail">After display adjustment finishes using a camera, its private worker may stop after one idle second. Queued callbacks and future submissions remain valid. Camera sampling, display adjustment and active camera workers are retained.</string>
+    <string name="start_on_boot">Start automatically after device boot</string>
+    <string name="start_on_boot_detail">Prepare settings after the first unlock. Turning this off keeps on-demand setup available when a supported app opens.</string>
 </resources>
