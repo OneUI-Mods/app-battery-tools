@@ -69,3 +69,5 @@ The benefit depends on how long unnecessary positioning would otherwise have run
 Source: [OneUI-Mods/app-battery-tools](https://github.com/OneUI-Mods/app-battery-tools). Library-specific licenses are available under **About** in the app.
 
 Developer information: [Development (Japanese)](docs/development.md), [Releasing (Japanese)](docs/releasing.md), and the [investigation index](docs/investigation/README.en.md).
+
+[Build environment / ビルド環境](docs/build-environment.md)

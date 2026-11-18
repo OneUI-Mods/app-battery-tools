@@ -10,12 +10,12 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '27'
       - uses: android-actions/setup-android@v3
         with:
           packages: platform-tools
           log-accepted-android-sdk-licenses: false
-      - run: sdkmanager 'platforms;android-37.0' 'build-tools;37.0.0'
+      - run: sdkmanager 'platforms;android-37.2' 'build-tools;37.0.0'
       - name: Bootstrap checksum-verified Gradle
         env:
           GH_TOKEN: ${{ github.token }}

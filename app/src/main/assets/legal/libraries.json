@@ -2,7 +2,7 @@
   {
     "id": "project",
     "title": "App Battery Tools",
-    "version": "0.1.0",
+    "version": "0.5.2",
     "license": "MIT",
     "asset": "legal/PROJECT-MIT.txt"
   },
@@ -383,12 +383,44 @@
     "notice": "com.google.errorprone:error_prone_annotations:2.15.0\nhttps://github.com/google/error-prone\nCopyright belongs to the respective authors and contributors."
   },
   {
+    "id": "com.google.flatbuffers:flatbuffers-java",
+    "version": "23.5.26",
+    "title": "FlatBuffers",
+    "license": "Apache-2.0",
+    "asset": "legal/FLATBUFFERS-23.5.26.txt",
+    "notice": "https://github.com/google/flatbuffers/tree/v23.5.26\nCopyright belongs to the respective authors and contributors."
+  },
+  {
     "id": "com.google.guava:listenablefuture",
     "title": "listenablefuture",
     "version": "1.0",
     "license": "Apache-2.0",
     "asset": "legal/APACHE-2.0.txt",
     "notice": "com.google.guava:listenablefuture:1.0\nhttps://github.com/google/guava\nCopyright belongs to the respective authors and contributors."
+  },
+  {
+    "id": "dev.rikka.ndk.thirdparty:cxx",
+    "version": "1.2.0",
+    "title": "LLVM libc++ (Android Prefab)",
+    "license": "Apache-2.0 WITH LLVM-exception",
+    "asset": "legal/LIBCXX-1.2.0.txt",
+    "notice": "https://github.com/RikkaW/libcxx-prefab\nCopyright belongs to the respective authors and contributors."
+  },
+  {
+    "id": "io.github.libxposed:interface",
+    "title": "libxposed interface",
+    "version": "102.0.0",
+    "license": "Apache-2.0",
+    "asset": "legal/APACHE-2.0.txt",
+    "notice": "libxposed contributors. https://github.com/JingMatrix/libxposed-service"
+  },
+  {
+    "id": "io.github.libxposed:service",
+    "title": "libxposed service",
+    "version": "102.0.0",
+    "license": "Apache-2.0",
+    "asset": "legal/APACHE-2.0.txt",
+    "notice": "libxposed contributors. https://github.com/JingMatrix/libxposed-service"
   },
   {
     "id": "org.jetbrains.kotlin:kotlin-stdlib-jdk7",
@@ -409,10 +441,10 @@
   {
     "id": "org.jetbrains.kotlin:kotlin-stdlib",
     "title": "kotlin-stdlib",
-    "version": "2.2.10",
+    "version": "2.4.21",
     "license": "Apache 2.0, BSD 3-Clause, Boost 1.0",
-    "asset": "legal/KOTLIN-2.2.10.txt",
-    "notice": "org.jetbrains.kotlin:kotlin-stdlib:2.2.10\nhttps://kotlinlang.org/\nCopyright belongs to the respective authors and contributors."
+    "asset": "legal/KOTLIN-2.4.21.txt",
+    "notice": "org.jetbrains.kotlin:kotlin-stdlib:2.4.21\nhttps://kotlinlang.org/\nCopyright belongs to the respective authors and contributors."
   },
   {
     "id": "org.jetbrains.kotlinx:kotlinx-coroutines-android",
@@ -447,52 +479,11 @@
     "notice": "org.jspecify:jspecify:1.0.0\nhttp://jspecify.org/\nCopyright belongs to the respective authors and contributors."
   },
   {
-    "id": "io.github.libxposed:api",
-    "title": "libxposed API",
-    "version": "102.0.0",
-    "license": "Apache-2.0",
-    "asset": "legal/APACHE-2.0.txt",
-    "reference": true,
-    "notice": "Compile-time API reference only; not bundled. https://github.com/libxposed/api\nCopyright belongs to the respective authors and contributors."
-  },
-  {
-    "id": "io.github.libxposed:service",
-    "title": "libxposed service",
-    "version": "102.0.0",
-    "license": "Apache-2.0",
-    "asset": "legal/APACHE-2.0.txt",
-    "notice": "libxposed contributors. https://github.com/JingMatrix/libxposed-service"
-  },
-  {
-    "id": "io.github.libxposed:interface",
-    "title": "libxposed interface",
-    "version": "102.0.0",
-    "license": "Apache-2.0",
-    "asset": "legal/APACHE-2.0.txt",
-    "notice": "libxposed contributors. https://github.com/JingMatrix/libxposed-service"
-  },
-  {
     "id": "org.luckypray:dexkit",
     "version": "2.3.0",
     "title": "DexKit",
     "license": "LGPL-3.0-or-later AND Apache-2.0",
     "asset": "legal/DEXKIT-2.3.0.txt",
     "notice": "https://github.com/LuckyPray/DexKit/tree/2.3.0\nCopyright belongs to the respective authors and contributors."
-  },
-  {
-    "id": "com.google.flatbuffers:flatbuffers-java",
-    "version": "23.5.26",
-    "title": "FlatBuffers",
-    "license": "Apache-2.0",
-    "asset": "legal/FLATBUFFERS-23.5.26.txt",
-    "notice": "https://github.com/google/flatbuffers/tree/v23.5.26\nCopyright belongs to the respective authors and contributors."
-  },
-  {
-    "id": "dev.rikka.ndk.thirdparty:cxx",
-    "version": "1.2.0",
-    "title": "LLVM libc++ (Android Prefab)",
-    "license": "Apache-2.0 WITH LLVM-exception",
-    "asset": "legal/LIBCXX-1.2.0.txt",
-    "notice": "https://github.com/RikkaW/libcxx-prefab\nCopyright belongs to the respective authors and contributors."
   }
 ]

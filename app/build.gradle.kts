@@ -5,7 +5,9 @@ plugins {
 
 android {
     namespace = "dev.ryuya.appbatterytools"
-    compileSdk = 37
+    compileSdk {
+        version = release(37) { minorApiLevel = 2 }
+    }
     buildToolsVersion = "37.0.0"
     defaultConfig {
         applicationId = "dev.ryuya.appbatterytools"

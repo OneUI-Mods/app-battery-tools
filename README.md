@@ -69,3 +69,5 @@ Digi Police 3.7.0で経路を確認しています。Javaのサービスと位�
 ソース: [OneUI-Mods/app-battery-tools](https://github.com/OneUI-Mods/app-battery-tools)。アプリ内の「情報」からライブラリ別にライセンスを確認できます。
 
 開発向け情報: [開発](docs/development.md)・[配布](docs/releasing.md)・[調査一覧](docs/investigation/README.md)。
+
+[Build environment / ビルド環境](docs/build-environment.md)
