@@ -1,6 +1,6 @@
 # リリース
 
-JDK 21以降とAndroid SDK 37を用意し、`./gradlew :app:testDebugUnitTest :app:assembleRelease :app:lintRelease :app:spotlessCheck`を実行します。
+JDK 27以降とAndroid SDK 37.2を用意し、`./gradlew :app:testDebugUnitTest :app:assembleRelease :app:lintRelease :app:spotlessCheck`を実行します。
 
 配布用PKCS12鍵は非公開の`.signing/release.keystore`、パスワードは`.signing/password`、aliasは`appbatterytools-release`です。同じ鍵を継続し、新しく作り直しません。アプリ別バックアップはDocumentsとWindows Bドライブの指定された非公開署名鍵フォルダに保存します。
 
