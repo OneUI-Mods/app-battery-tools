@@ -128,6 +128,8 @@ class HookEntry : XposedModule() {
     }
 
     private fun tryInstall(context: Context) {
+        // Permission results can arrive after another lifecycle event completed setup.
+        if (initialized) return
         if (install(context)) {
             initialized = true
             discoveryObserver?.let(context.contentResolver::unregisterContentObserver)
