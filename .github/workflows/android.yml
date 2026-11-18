@@ -32,5 +32,5 @@ jobs:
           unzip -q "$directory/gradle-$version-bin.zip" -d "$directory"
           echo "$directory/gradle-$version/bin" >> "$GITHUB_PATH"
       - uses: gradle/actions/setup-gradle@v4
-      - run: gradle :app:testDebugUnitTest :app:assembleRelease :app:lintRelease :app:spotlessCheck :app:writeRuntimeDependencyList --max-workers=2
+      - run: gradle :app:testDebugUnitTest :app:assembleRelease :app:assembleDebugAndroidTest :app:lintRelease :app:spotlessCheck :app:writeRuntimeDependencyList --max-workers=2
       - run: python3 tools/check_license_catalog.py
