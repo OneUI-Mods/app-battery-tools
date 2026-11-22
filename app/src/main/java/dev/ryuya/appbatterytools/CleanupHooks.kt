@@ -4,13 +4,12 @@ import android.content.Context
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import io.github.libxposed.api.XposedInterface.HookHandle
-import io.github.libxposed.api.XposedModule
 import org.luckypray.dexkit.wrap.DexField
 import org.luckypray.dexkit.wrap.DexMethod
 
 /** Event-bound cleanup in the host app. No additional periodic work. */
 internal class CleanupHooks(
-    private val module: XposedModule,
+    private val module: BatteryHookSession,
     private val context: Context,
     private val report: (String, Throwable?, Int?) -> Unit,
     private val changed: () -> Unit,

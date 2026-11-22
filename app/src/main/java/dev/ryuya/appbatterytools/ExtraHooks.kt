@@ -4,14 +4,13 @@ import android.content.Context
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import io.github.libxposed.api.XposedInterface.HookHandle
-import io.github.libxposed.api.XposedModule
 import java.lang.reflect.Method
 import java.util.concurrent.atomic.AtomicInteger
 import org.luckypray.dexkit.wrap.DexField
 import org.luckypray.dexkit.wrap.DexMethod
 
 internal class ExtraHooks(
-    private val module: XposedModule,
+    private val module: BatteryHookSession,
     private val context: Context,
     private val report: (String, Throwable?, Int?) -> Unit,
 ) {
@@ -82,6 +81,7 @@ internal class ExtraHooks(
     private fun windowsDatabase(config: Bundle) {
         val factory = method(config, "database")
         val shared = BoundedMemo<Unit, Any?>(1)
+        module.beforeRetirement { shared.size == 0 }
         val close =
             factory.returnType.methods.single {
                 it.name == "close" && it.parameterCount == 0 && it.returnType == Void.TYPE
@@ -190,6 +190,9 @@ internal class ExtraHooks(
                 .getFieldInstance(loader)
                 .apply { isAccessible = true }
         val lifecycle = MatterLifecycle()
+        module.beforeRetirement {
+            synchronized(lifecycle) { controller.get(null) == null }
+        }
         fun acquire() {
             val lock = field.get(null) as? WifiManager.MulticastLock ?: return
             if (!lock.isHeld) lock.acquire()

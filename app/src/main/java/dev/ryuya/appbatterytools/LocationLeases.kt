@@ -27,6 +27,8 @@ internal class LocationLeases<O : Any, C : Any, L : Any>(
         }
     }
 
+    @Synchronized fun isIdle(): Boolean = leases.isEmpty()
+
     data class Removal(val requested: Int, val failed: Int)
 
     @Synchronized

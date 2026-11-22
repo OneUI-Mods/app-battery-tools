@@ -20,12 +20,11 @@ import android.net.NetworkRequest
 import android.os.Handler
 import android.os.Looper
 import io.github.libxposed.api.XposedInterface.HookHandle
-import io.github.libxposed.api.XposedModule
 import java.lang.reflect.Method
 
 /** Host-process events only. No service, polling, global BLE switch, or connection termination. */
 internal class BleWifiHooks(
-    private val module: XposedModule,
+    private val module: BatteryHookSession,
     private val context: Context,
     private val report: (String, Throwable?, Int?) -> Unit,
 ) {
@@ -262,6 +261,20 @@ internal class BleWifiHooks(
                             chain.proceed()
                         }
                     }
+            }
+            module.beforeRetirement {
+                synchronized(lock) {
+                    registry.size == 0 &&
+                        transitions.activeCount == 0 &&
+                        transitions.queue.isEmpty()
+                }
+            }
+            module.onRetire {
+                disposed = true
+                operational = false
+                transitions.shutdownNow()
+                runCatching { connectivity.unregisterNetworkCallback(networkCallback) }
+                runCatching { context.unregisterReceiver(bluetoothReset) }
             }
             operational = true
             report(if (connected) "wifi_active" else "wifi_paused", null, null)

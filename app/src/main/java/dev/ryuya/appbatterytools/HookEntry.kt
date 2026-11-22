@@ -14,10 +14,13 @@ import android.database.ContentObserver
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.Process
 import android.util.Log
 import dev.ryuya.appbatterytools.startup.FirstUnlockGate
 import io.github.libxposed.api.XposedInterface.HookHandle
 import io.github.libxposed.api.XposedModule
+import io.github.libxposed.api.XposedModuleInterface.HotReloadedParam
+import io.github.libxposed.api.XposedModuleInterface.HotReloadingParam
 import io.github.libxposed.api.XposedModuleInterface.PackageReadyParam
 import java.util.IdentityHashMap
 
@@ -27,6 +30,12 @@ class HookEntry : XposedModule() {
     private var lifecyclePrepared = false
     private var initialized = false
     private val firstUnlock = FirstUnlockGate()
+    private val session = BatteryHookSession(this)
+    private val main = Handler(Looper.getMainLooper())
+    private var readyHost: Context? = null
+    private var onInstalled: (() -> Unit)? = null
+    @Volatile private var reconnectHost: Context? = null
+    @Volatile private var retired = false
     private var accessRequested = false
     private var discoveryObserver: ContentObserver? = null
 
@@ -54,15 +63,17 @@ class HookEntry : XposedModule() {
             initialize(application)
             return
         }
-        hook(Application::class.java.getDeclaredMethod("attach", Context::class.java)).intercept {
-            chain ->
-            val result = chain.proceed()
-            initialize(chain.args[0] as Context)
-            result
-        }
+        session
+            .hook(Application::class.java.getDeclaredMethod("attach", Context::class.java))
+            .intercept { chain ->
+                val result = chain.proceed()
+                initialize(chain.args[0] as Context)
+                result
+            }
         // API 102 PackageReady can arrive after Application.attach. Instrumentation still owns
         // the subsequent onCreate call, including for applications overriding onCreate.
-        hook(
+        session
+            .hook(
                 Instrumentation::class
                     .java
                     .getDeclaredMethod("callApplicationOnCreate", Application::class.java),
@@ -72,6 +83,45 @@ class HookEntry : XposedModule() {
                 initialize(context)
                 chain.proceed()
             }
+    }
+
+    override fun onHotReloading(param: HotReloadingParam): Boolean =
+        MainThreadReload.run(main) handOff@{
+            val context = readyHost ?: reconnectHost ?: return@handOff false
+            if (!session.tryRetire { param.setSavedInstanceState(context) }) return@handOff false
+            retired = true
+            discoveryObserver?.let {
+                runCatching { context.contentResolver.unregisterContentObserver(it) }
+                discoveryObserver = null
+            }
+            main.removeCallbacksAndMessages(null)
+            onInstalled = null
+            true
+        }
+
+    override fun onHotReloaded(param: HotReloadedParam) {
+        val context = requireNotNull(param.savedInstanceState as? Context)
+        check(Targets.find(context.packageName) != null)
+        val oldHooks = param.oldHookHandles
+        reconnectHost = context
+        check(
+            MainThreadReload.run(main) {
+                lifecyclePrepared = true
+                onInstalled = {
+                    reconnectHost = null
+                    oldHooks.forEach { it.unhook() }
+                    Log.i(
+                        "AppBatteryTools",
+                        "ONEUI_MODS_HOT_RELOAD package=${BuildConfig.APPLICATION_ID} " +
+                            "version=${BuildConfig.VERSION_CODE} pid=${Process.myPid()}",
+                    )
+                }
+                initialize(context)
+                true
+            },
+        ) {
+            "Battery host main thread was unavailable"
+        }
     }
 
     private fun currentApplication(): Application? =
@@ -84,12 +134,12 @@ class HookEntry : XposedModule() {
         }
 
     private fun initialize(context: Context) {
-        if (initialized || Targets.find(context.packageName) == null) return
+        if (retired || initialized || Targets.find(context.packageName) == null) return
         firstUnlock.run(context) { initializeUnlocked(context) }
     }
 
     private fun initializeUnlocked(context: Context) {
-        if (initialized) return
+        if (retired || initialized) return
         try {
             tryInstall(context)
         } catch (error: Exception) {
@@ -129,11 +179,11 @@ class HookEntry : XposedModule() {
 
     private fun tryInstall(context: Context) {
         // Permission results can arrive after another lifecycle event completed setup.
-        if (initialized) return
+        if (retired || initialized) return
         if (install(context)) {
-            initialized = true
             discoveryObserver?.let(context.contentResolver::unregisterContentObserver)
             discoveryObserver = null
+            finishInstallation(context)
             return
         }
         if (discoveryObserver != null) return
@@ -147,10 +197,16 @@ class HookEntry : XposedModule() {
         discoveryObserver = observer
         // Covers discovery finishing between the first read and observer registration.
         if (install(context)) {
-            initialized = true
             context.contentResolver.unregisterContentObserver(observer)
             discoveryObserver = null
+            finishInstallation(context)
         }
+    }
+
+    private fun finishInstallation(context: Context) {
+        initialized = true
+        readyHost = context
+        onInstalled?.also { onInstalled = null }?.invoke()
     }
 
     private fun install(context: Context): Boolean {
@@ -168,7 +224,7 @@ class HookEntry : XposedModule() {
         }
         if (context.packageName != Targets.DIGIPOLICE) {
             check(config.getString("apk") == context.applicationInfo.sourceDir)
-            ExtraHooks(this, context) { state, error, count ->
+            ExtraHooks(session, context) { state, error, count ->
                     report(context, state, error, count)
                 }
                 .install(config)
@@ -263,7 +319,12 @@ class HookEntry : XposedModule() {
         try {
             for (method in listOf("startForegroundService", "startService")) {
                 installed +=
-                    hook(ContextWrapper::class.java.getDeclaredMethod(method, Intent::class.java))
+                    session
+                        .hook(
+                            ContextWrapper::class
+                                .java
+                                .getDeclaredMethod(method, Intent::class.java),
+                        )
                         .intercept { chain ->
                             val component = (chain.args[0] as? Intent)?.component
                             if (
@@ -278,7 +339,7 @@ class HookEntry : XposedModule() {
                         }
             }
             installed +=
-                hook(register).intercept { chain ->
+                session.hook(register).intercept { chain ->
                     val current = owner.get()
                     val result = chain.proceed()
                     if (current != null && healthy) {
@@ -296,7 +357,7 @@ class HookEntry : XposedModule() {
                     result
                 }
             installed +=
-                hook(start).intercept { chain ->
+                session.hook(start).intercept { chain ->
                     val instance = chain.thisObject as Service
                     val previous = owner.get()
                     if (healthy) {
@@ -319,7 +380,7 @@ class HookEntry : XposedModule() {
                     } else result
                 }
             installed +=
-                hook(destroy).intercept { chain ->
+                session.hook(destroy).intercept { chain ->
                     try {
                         chain.proceed()
                     } finally {
@@ -340,6 +401,12 @@ class HookEntry : XposedModule() {
                         }
                     }
                 preferences.registerOnSharedPreferenceChangeListener(areaSettingsListener)
+            }
+            session.beforeRetirement { promoted.isEmpty() && leases.isIdle() }
+            session.onRetire {
+                main.removeCallbacks(stopDisabledService)
+                areaSettingsListener?.let(preferences::unregisterOnSharedPreferenceChangeListener)
+                areaSettingsListener = null
             }
             report(context, "active")
         } catch (error: Throwable) {
