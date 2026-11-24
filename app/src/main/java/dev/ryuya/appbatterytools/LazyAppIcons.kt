@@ -3,6 +3,7 @@ package dev.ryuya.appbatterytools
 import android.content.pm.PackageItemInfo
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
 import android.graphics.BlendMode
 import android.graphics.Canvas
 import android.graphics.ColorFilter
@@ -11,6 +12,8 @@ import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.LruCache
+import kotlin.math.max
+import kotlin.math.roundToInt
 
 /**
  * Icons whose pixels are read from the package only while they are drawn. The host keeps one icon
@@ -46,6 +49,23 @@ internal class LazyAppIcons(private val budgetBytes: Int) {
             arrayOf(icon.background, icon.foreground, icon.monochrome, null)
         else arrayOf(null, null, null, icon)
 
+    /** Drawn pixels only: bitmap layers keep [limit] pixels on their longest side. */
+    private fun shrink(drawable: Drawable?, limit: Int): Drawable? {
+        val bitmap = (drawable as? BitmapDrawable)?.bitmap ?: return drawable
+        val side = max(bitmap.width, bitmap.height)
+        if (side <= limit) return drawable
+        val scale = limit.toFloat() / side
+        return BitmapDrawable(
+            null,
+            Bitmap.createScaledBitmap(
+                bitmap,
+                (bitmap.width * scale).roundToInt().coerceAtLeast(1),
+                (bitmap.height * scale).roundToInt().coerceAtLeast(1),
+                true,
+            ),
+        )
+    }
+
     /** Lock held. Reads the icon again from its package. */
     private fun load(info: PackageItemInfo, manager: PackageManager): Loaded? {
         cache.get(key(info))?.let {
@@ -58,7 +78,12 @@ internal class LazyAppIcons(private val budgetBytes: Int) {
             } finally {
                 loading.remove()
             } ?: return null
-        val layers = split(icon)
+        val layers =
+            split(icon)
+                .mapIndexed<Drawable?, Drawable?> { index, layer ->
+                    shrink(layer, if (index == 3) ICON_SIDE else LAYER_SIDE)
+                }
+                .toTypedArray()
         val loaded = Loaded(layers, layers.sumOf { bytes(it) })
         cache.put(key(info), loaded)
         return loaded
@@ -127,5 +152,15 @@ internal class LazyAppIcons(private val budgetBytes: Int) {
         override fun onStateChange(state: IntArray) = true
 
         @Deprecated("Deprecated in Drawable") override fun getOpacity() = PixelFormat.TRANSLUCENT
+    }
+
+    private companion object {
+        const val ICON_SIDE = 144
+
+        /**
+         * Layers span 108 dp with the visible icon in the middle 72 dp; 216 px keeps 144 px
+         * visible.
+         */
+        const val LAYER_SIDE = 216
     }
 }
