@@ -27,6 +27,7 @@
 | Tapo | Matter探索の同期的な開始失敗時に、その呼び出しが取得したロック参照を返却 |
 | Simeji | 診断SDKの500ms周期のANR監視登録を停止 |
 | Multiple Picture Wallpaper | 壁紙が4秒間隠れたあと、壁紙プロセスのGPUキャッシュを解放 |
+| Dynamic Island (mtisland) | 全アプリのアイコンを描画時だけ読み込み、常駐メモリを削減 |
 | LANDrop | 所有するFlutterエンジンの終了確認後、探索用ロックを解放 |
 | Continuity Service | 一部の停止要求で例外が起きても残りのBLE停止要求を継続 |
 | Digi Police | エリア通知OFF中の不要な測位サービスの開始抑止と終了時の受信処理解放 |

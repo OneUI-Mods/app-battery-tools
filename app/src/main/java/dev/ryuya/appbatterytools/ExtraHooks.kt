@@ -54,6 +54,11 @@ internal class ExtraHooks(
                     BleWifiHooks(module, context, report).install()
                     return
                 }
+                Targets.ISLAND -> {
+                    WidgetPreviewHooks(module, report).install()
+                    report("active", null, null)
+                    return
+                }
                 Targets.WALLPAPER -> {
                     WallpaperTrimHooks(module, report).install()
                     report("active", null, null)

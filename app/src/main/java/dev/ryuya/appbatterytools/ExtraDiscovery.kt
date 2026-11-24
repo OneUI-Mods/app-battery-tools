@@ -16,6 +16,7 @@ internal object ExtraDiscovery {
         if (packageName == Targets.GOVEE || packageName == Targets.SESAME)
             return mapOf("contract" to "android-ble-wifi")
         if (packageName == Targets.WALLPAPER) return mapOf("contract" to "android-wallpaper-trim")
+        if (packageName == Targets.ISLAND) return mapOf("contract" to "android-widget-preview")
         System.loadLibrary("dexkit")
         return DexKitBridge.create(apk).use { bridge ->
             bridge.setThreadNum(2)

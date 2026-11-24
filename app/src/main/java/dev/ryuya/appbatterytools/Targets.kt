@@ -33,6 +33,7 @@ object Targets {
     const val CONTINUITY = "com.samsung.android.mcfds"
     const val SEAD = "com.samsung.android.sead"
     const val WALLPAPER = "jp.kamesan.android.multiple_picture_wallpaper_2"
+    const val ISLAND = "com.pryshedko.mtisland"
     val all =
         listOf(
             Target(
@@ -125,6 +126,14 @@ object Targets {
                 "simeji-sdk-anr-polling-v1",
                 R.string.simeji_anr_detail,
                 listOf(Option("simeji_anr", R.string.simeji_anr)),
+            ),
+            Target(
+                ISLAND,
+                "Dynamic Island (mtisland)",
+                "63e05db5ac02a4147a134b5209edca396cce8c46a9edb09b3173d3d5c821341e",
+                "widget-preview-reduce-v1",
+                R.string.island_detail,
+                listOf(Option("island_previews", R.string.island_previews)),
             ),
             Target(
                 WALLPAPER,

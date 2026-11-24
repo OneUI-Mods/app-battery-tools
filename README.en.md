@@ -27,6 +27,7 @@ Hook initialization that needs settings or cached discovery results waits for th
 | Tapo | Return the lock reference acquired by a Matter discovery call when startup fails synchronously |
 | Simeji | Disable the diagnostic SDK's ANR monitor registration that runs every 500 ms |
 | Multiple Picture Wallpaper | Release the wallpaper process's GPU caches after it stays hidden for 4 seconds |
+| Dynamic Island (mtisland) | Load app icons only while they are drawn to cut resident memory |
 | LANDrop | Release its discovery lock after confirming that the owning Flutter engine has stopped |
 | Continuity Service | Continue the remaining BLE stop requests even if some stop requests throw exceptions |
 | Digi Police | Suppress unnecessary positioning-service starts while area notifications are off, and release the service's receivers on shutdown |

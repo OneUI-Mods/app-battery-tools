@@ -44,6 +44,12 @@ class HookEntry : XposedModule() {
             "AppBatteryTools",
             "PackageReady ${param.packageName}; build=${BuildConfig.VERSION_CODE}",
         )
+        if (param.isFirstPackage && Targets.find(param.packageName) == null) {
+            // Scope is chosen in the framework. Processes without a supported app keep no module
+            // code.
+            detach()
+            return
+        }
         if (lifecyclePrepared || Targets.find(param.packageName) == null) return
         lifecyclePrepared = true
         if (param.packageName == Targets.GOVEE) {
