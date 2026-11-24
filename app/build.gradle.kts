@@ -13,8 +13,8 @@ android {
         applicationId = "dev.ryuya.appbatterytools"
         minSdk = 36
         targetSdk = 37
-        versionCode = 15
-        versionName = "0.5.4"
+        versionCode = 16
+        versionName = "0.5.5"
         testInstrumentationRunner = "dev.ryuya.appbatterytools.DiscoveryInstrumentation"
     }
     buildFeatures { buildConfig = true }

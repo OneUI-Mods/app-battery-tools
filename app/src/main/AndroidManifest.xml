@@ -10,6 +10,7 @@
         <package android:name="com.samsung.android.oneconnect" />
         <package android:name="com.tplink.iot" />
         <package android:name="com.adamrocker.android.input.simeji" />
+        <package android:name="jp.kamesan.android.multiple_picture_wallpaper_2" />
         <package android:name="app.landrop.landrop_flutter" />
         <package android:name="com.samsung.android.mcfds" />
         <package android:name="com.samsung.android.sead" />

@@ -71,4 +71,6 @@ Hook: %2$s
   <string name="sead_detail">After display adjustment finishes using a camera, its private worker may stop after one idle second. Queued callbacks and future submissions remain valid. Camera sampling, display adjustment and active camera workers are retained.</string>
     <string name="start_on_boot">Start automatically after device boot</string>
     <string name="start_on_boot_detail">Prepare settings after the first unlock. Turning this off keeps on-demand setup available when a supported app opens.</string>
+  <string name="wallpaper_trim">Release the live wallpaper’s GPU memory while it is hidden</string>
+  <string name="wallpaper_detail">Frees the wallpaper process’s GPU texture and window-buffer caches 4 seconds after every wallpaper engine is hidden. The pictures upload again the next time the wallpaper is drawn, so the first redraw after returning Home can take slightly longer. Wallpaper settings and images are untouched.</string>
 </resources>

@@ -15,6 +15,7 @@ internal object ExtraDiscovery {
         // These two policies own Android BLE registrations, not protected/obfuscated app methods.
         if (packageName == Targets.GOVEE || packageName == Targets.SESAME)
             return mapOf("contract" to "android-ble-wifi")
+        if (packageName == Targets.WALLPAPER) return mapOf("contract" to "android-wallpaper-trim")
         System.loadLibrary("dexkit")
         return DexKitBridge.create(apk).use { bridge ->
             bridge.setThreadNum(2)

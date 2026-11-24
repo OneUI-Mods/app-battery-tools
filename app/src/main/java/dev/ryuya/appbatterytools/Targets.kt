@@ -32,6 +32,7 @@ object Targets {
     const val LANDROP = "app.landrop.landrop_flutter"
     const val CONTINUITY = "com.samsung.android.mcfds"
     const val SEAD = "com.samsung.android.sead"
+    const val WALLPAPER = "jp.kamesan.android.multiple_picture_wallpaper_2"
     val all =
         listOf(
             Target(
@@ -124,6 +125,14 @@ object Targets {
                 "simeji-sdk-anr-polling-v1",
                 R.string.simeji_anr_detail,
                 listOf(Option("simeji_anr", R.string.simeji_anr)),
+            ),
+            Target(
+                WALLPAPER,
+                "Multiple Picture Wallpaper",
+                "76e0239e873aac356a9a6ec0191cefbfa18d4800787659ffd224fed2a98628e7",
+                "wallpaper-gpu-trim-v1",
+                R.string.wallpaper_detail,
+                listOf(Option("wallpaper_trim", R.string.wallpaper_trim)),
             ),
             Target(
                 LANDROP,
