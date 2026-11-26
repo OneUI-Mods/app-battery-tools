@@ -1,8 +1,10 @@
 # App Battery Tools
 
+インストールにはAndroid 17（API 37）以降が必要です。
+
 [日本語](README.md) · [English](README.en.md)
 
-対象アプリごとの不要な電池消費を抑えるVector / Xposedモジュールです。Android 16／17、libxposed API 102に対応します。
+対象アプリごとの不要な電池消費を抑えるVector / Xposedモジュールです。Android 17、libxposed API 102に対応します。
 
 ## 端末起動時の自動起動
 

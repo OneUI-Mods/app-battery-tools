@@ -1,8 +1,10 @@
 # App Battery Tools
 
+Installation requires Android 17 (API 37) or later.
+
 [日本語](README.md) · English
 
-A Vector / Xposed module that reduces unnecessary battery use in selected apps. Supports Android 16/17 and libxposed API 102.
+A Vector / Xposed module that reduces unnecessary battery use in selected apps. Supports Android 17 and libxposed API 102.
 
 ## Automatic startup after boot
 

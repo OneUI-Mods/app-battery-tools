@@ -1,6 +1,6 @@
 # App Battery Tools
 
-- Keep Android implementation in Kotlin and support Android 16/17 with API 102.
+- Keep Android implementation in Kotlin and support Android 17 with API 102.
 - This app must not add a background/foreground service, periodic worker, alarm or polling loop. Discovery and Binder-metadata workers release idle threads after one second.
 - Hooks own only the selected application's registrations. Do not change global location providers, permissions, geofences, notification delivery, calls or audio.
 - APKs and decompiled third-party code belong in the root `.workspace`, never in Git or source ZIPs.

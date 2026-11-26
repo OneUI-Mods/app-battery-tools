@@ -18,7 +18,7 @@ Additional APK analysis of system apps is collected in the [three Samsung-compon
 - Do not add changes with only marginal benefits. Prioritize substantial waste whose cause and correction can be explained from both consumption records and APK analysis.
 - Distinguish bug fixes from changes that save power by degrading required notifications, synchronization, calls, location accuracy, or responsiveness.
 - Preserve Digi Police behavior while **Receive area notifications** is on. Suppress unnecessary positioning-service starts only for verified off-state settings. Do not assume the problem is simply a permanent cleanup leak after shutdown.
-- Use Kotlin, libxposed API 102, Android 16/17 support, DexKit validation of semantics/types/uniqueness, and per-app switches.
+- Use Kotlin, libxposed API 102, Android 17 support, DexKit validation of semantics/types/uniqueness, and per-app switches.
 - Store DexKit results in the module's own internal data. Rescan only on first use or target APK updates; do not perform full DEX discovery inside normal hooks or drawing callbacks.
 
 ## Investigated scope
