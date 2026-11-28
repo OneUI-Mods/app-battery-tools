@@ -21,6 +21,7 @@ internal object ExtraDiscovery {
         return DexKitBridge.create(apk).use { bridge ->
             bridge.setThreadNum(2)
             when (packageName) {
+                Targets.GALAXY_STORE -> GalaxyStoreDiscovery.explore(bridge)
                 Targets.WINDOWS -> windows(bridge)
                 Targets.EQ -> equalizer(bridge)
                 Targets.ECOVACS -> ecovacs(bridge)

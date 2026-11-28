@@ -75,4 +75,6 @@ Hook: %2$s
   <string name="wallpaper_detail">Frees the wallpaper process’s GPU texture and window-buffer caches 4 seconds after every wallpaper engine is hidden. The pictures upload again the next time the wallpaper is drawn, so the first redraw after returning Home can take slightly longer. Wallpaper settings and images are untouched.</string>
   <string name="island_previews">Load app icons only when they are drawn</string>
   <string name="island_detail">The app loads the icon of every launchable app when it starts and keeps them all in memory. Icons are now read from each app only while they are drawn, and only recently drawn ones stay in a 16 MB cache. Adaptive and monochrome icons keep their layers. Widget previews are kept at most 256 pixels on their longest side. Showing many icons for the first time can take slightly longer.</string>
+    <string name="store_banner">Stop banner videos when leaving the store</string>
+    <string name="store_banner_detail">When Galaxy Store is no longer visible, stops its home banner videos and releases their decoders. Playback can restart in the store and app updates continue normally. Restart the store to apply changes.</string>
 </resources>

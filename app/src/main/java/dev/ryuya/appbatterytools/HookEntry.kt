@@ -38,6 +38,8 @@ class HookEntry : XposedModule() {
     @Volatile private var retired = false
     private var accessRequested = false
     private var discoveryObserver: ContentObserver? = null
+    private var storeHooks: GalaxyStoreHooks? = null
+    private var storeState: Array<*>? = null
 
     override fun onPackageReady(param: PackageReadyParam) {
         Log.i(
@@ -48,6 +50,13 @@ class HookEntry : XposedModule() {
             // Scope is chosen in the framework. Processes without a supported app keep no module
             // code.
             detach()
+            return
+        }
+        if (
+            param.packageName == Targets.GALAXY_STORE &&
+                Application.getProcessName() != Targets.GALAXY_STORE
+        ) {
+            if (param.isFirstPackage) detach()
             return
         }
         if (lifecyclePrepared || Targets.find(param.packageName) == null) return
@@ -94,7 +103,15 @@ class HookEntry : XposedModule() {
     override fun onHotReloading(param: HotReloadingParam): Boolean =
         MainThreadReload.run(main) handOff@{
             val context = readyHost ?: reconnectHost ?: return@handOff false
-            if (!session.tryRetire { param.setSavedInstanceState(context) }) return@handOff false
+            if (
+                !session.tryRetire {
+                    val state = storeHooks?.handoff()
+                    param.setSavedInstanceState(
+                        if (state == null) context else arrayOf(context, state),
+                    )
+                }
+            )
+                return@handOff false
             retired = true
             discoveryObserver?.let {
                 runCatching { context.contentResolver.unregisterContentObserver(it) }
@@ -106,7 +123,10 @@ class HookEntry : XposedModule() {
         }
 
     override fun onHotReloaded(param: HotReloadedParam) {
-        val context = requireNotNull(param.savedInstanceState as? Context)
+        val saved = param.savedInstanceState
+        val handoff = saved as? Array<*>
+        val context = requireNotNull((handoff?.getOrNull(0) ?: saved) as? Context)
+        storeState = handoff?.getOrNull(1) as? Array<*>
         check(Targets.find(context.packageName) != null)
         val oldHooks = param.oldHookHandles
         reconnectHost = context
@@ -223,6 +243,22 @@ class HookEntry : XposedModule() {
                 config == null || DiscoveryReadiness.pending(config.getString("discovery"))
             report(context, if (pending) "not_ready" else "unsupported")
             return !pending
+        }
+        if (context.packageName == Targets.GALAXY_STORE) {
+            val enabled = config.getBoolean("enabled") && config.getBoolean(Targets.STORE_BANNER)
+            if (!enabled && storeState == null) {
+                report(context, "disabled")
+                return true
+            }
+            check(config.getString("apk") == context.applicationInfo.sourceDir)
+            val hooks =
+                GalaxyStoreHooks(session, context, enabled, storeState) { state, error, count ->
+                    report(context, state, error, count)
+                }
+            hooks.install(config)
+            storeHooks = hooks
+            storeState = null
+            return true
         }
         if (!config.getBoolean("enabled")) {
             report(context, "disabled")

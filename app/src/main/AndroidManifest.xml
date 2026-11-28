@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <queries><package android:name="jp.co.dawncorp.DigiPolice" />
+    <queries>
+        <package android:name="com.sec.android.app.samsungapps" /><package android:name="jp.co.dawncorp.DigiPolice" />
         <package android:name="com.microsoft.appmanager" />
         <package android:name="com.govee.home" />
         <package android:name="co.candyhouse.sesame2" />

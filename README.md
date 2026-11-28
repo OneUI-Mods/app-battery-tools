@@ -30,6 +30,7 @@
 | Simeji | 診断SDKの500ms周期のANR監視登録を停止 |
 | Multiple Picture Wallpaper | 壁紙が4秒間隠れたあと、壁紙プロセスのGPUキャッシュを解放 |
 | Dynamic Island (mtisland) | 全アプリのアイコンを描画時だけ読み込み、常駐メモリを削減 |
+| Galaxy Store | 画面を離れたらトップ画面のバナー動画を停止してデコーダーを解放。再表示時はストア標準の再生を復帰 |
 | LANDrop | 所有するFlutterエンジンの終了確認後、探索用ロックを解放 |
 | Continuity Service | 一部の停止要求で例外が起きても残りのBLE停止要求を継続 |
 | Digi Police | エリア通知OFF中の不要な測位サービスの開始抑止と終了時の受信処理解放 |

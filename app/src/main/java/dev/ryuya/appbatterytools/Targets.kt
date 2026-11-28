@@ -34,8 +34,18 @@ object Targets {
     const val SEAD = "com.samsung.android.sead"
     const val WALLPAPER = "jp.kamesan.android.multiple_picture_wallpaper_2"
     const val ISLAND = "com.pryshedko.mtisland"
+    const val GALAXY_STORE = "com.sec.android.app.samsungapps"
+    const val STORE_BANNER = "store_banner"
     val all =
         listOf(
+            Target(
+                GALAXY_STORE,
+                "Galaxy Store",
+                "fba3af4e7757d9016e953fb3ee4671ca2bd9af725f9a53d52ed4a38eaaa08901",
+                "galaxy-store-slot-playback-v3",
+                R.string.store_banner_detail,
+                listOf(Option(STORE_BANNER, R.string.store_banner)),
+            ),
             Target(
                 SEAD,
                 "Samsung display adjustment",
